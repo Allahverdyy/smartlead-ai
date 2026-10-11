@@ -5,12 +5,14 @@ from config import config
 from app.database import init_db
 
 
-def create_app(ortam='default'):
-    """Uygulama fabrikası. Sıra: ayarlar -> CORS -> veritabanı -> blueprint'ler."""
+def create_app(ortam='default', **ek_ayarlar):
+    """Uygulama fabrikası. Sıra: ayarlar -> CORS -> veritabanı -> blueprint'ler.
+    ek_ayarlar: testlerde geçici veritabanı gibi ayarları dışarıdan vermek için."""
     app = Flask(__name__)
 
     # 1) Ayarlar
     app.config.from_object(config[ortam])
+    app.config.update(ek_ayarlar)
 
     # 2) CORS: API'yi yalnızca izin verilen alan adları (Wix sitemiz) çağırabilir
     CORS(app, resources={r'/api/*': {'origins': app.config['CORS_ORIGINS']}})

@@ -64,8 +64,7 @@ class AIService:
         if yanit.status_code != 200:
             raise AIServiceError(f'Yapay zekâ servisi hata döndürdü (kod {yanit.status_code}).')
 
-        metin = yanit.json()['choices'][0]['message']['content']
-        return self._temizle(metin)
+        return yanit.json()['choices'][0]['message']['content']
 
     def _temizle(self, metin):
         """Wix metin kutusu Markdown göstermez; model talimata uymasa bile yıldızları siler."""
@@ -76,7 +75,7 @@ class AIService:
         if not self.api_key:
             return ('Şu an demo modundayım. Sorunuzu iletmek için başvuru formunu '
                     'doldurabilir veya digital.ast.tr@gmail.com adresine yazabilirsiniz.')
-        cevap = self._groq_istegi(self._mesajlari_hazirla(mesaj, gecmis))
+        cevap = self._temizle(self._groq_istegi(self._mesajlari_hazirla(mesaj, gecmis)))
 
         # Son kapı: tadımlık örnek zaten verildiyse, model kurala uymasa bile ikinci örnek kullanıcıya gitmez
         if self._ornek_verildi_mi(gecmis) and self._ornek_iceriyor_mu(cevap):

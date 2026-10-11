@@ -11,7 +11,8 @@ AST Digital'in web sitesinde çalışan **akıllı satış asistanı**: Etsy sat
 
 - ✅ Ortam kurulumu ve duman testi
 - ✅ Mimari tasarım
-- ⬜ Backend modülleri (config, database, ai_service, routes, create_app)
+- ✅ Backend modülleri (config, database, ai_service, routes, create_app)
+- ✅ 22 otomatik test (`python -m pytest -v`)
 - ⬜ Wix arayüzleri ve Render yayını
 
 ## Yerelde çalıştırma
@@ -22,6 +23,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env      # ardından GROQ_API_KEY değerini doldurun
 python run.py               # http://localhost:5110
+python -m pytest -v         # testler
 ```
 
 ## Klasör yapısı

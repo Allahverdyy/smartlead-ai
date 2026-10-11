@@ -205,6 +205,16 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 
 ---
 
+## Modül F — Testler
+
+- `python -m pytest -v` → **22 test**, Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
+- `tests/test_api.py` (16): `/health`, sayfalar, `/api/sohbet` (400 / 200 demo / 503), `/api/leads` (201, telefon standardı, geçersiz isim/telefon/mağaza → 400, SQL enjeksiyonu, sıralama), `ADMIN_KEY` (401/200), CORS (Wix izinli, başka site engelli).
+- `tests/test_ai_service.py` (6): demo modu, mesaj sırası ve 10 mesaj sınırı, sahte `system` mesajının sızmaması, Markdown temizliği, ikinci örneği durduran kod kapısı.
+- **Testin yakaladığı hata:** Markdown temizliği Groq isteği fonksiyonunun içindeydi; tüm cevapların geçtiği `yanit_uret()`'e taşındı.
+- Elle çalıştırılan denemeler (gerçek Groq'a gider): `test_modul_b.py`, `test_modul_c.py`, `test_sinirlar.py` — `pytest.ini` bunları otomatik takıma almaz.
+
+---
+
 ## ⚠️ MUTLAKA DÖNÜLECEK — Chatbot ince ayarı (Belgrad öncesi)
 
 > Bu bölüm bitmeden sunuma çıkılmaz. Her maddeyi çözünce `test_sinirlar.py`'ye test olarak ekle ve işaretle.
@@ -328,7 +338,7 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
 | Rotalar · Fabrika + giriş | Modül D–E | ✅ 11 Ekim |
-| Çalıştırma + test | Modül F | 🟡 Kısmen (`test_modul_b/c`, `test_sinirlar`) |
+| Çalıştırma + test | Modül F | ✅ 11 Ekim — `pytest`: 22 otomatik test |
 | Chatbot ince ayarı | — | ⚠️ Açık maddeler var (yukarıda) |
 | Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
 | Render'da canlı yayın | Modül H (3–5) | ⬜ Belgrad öncesi |
