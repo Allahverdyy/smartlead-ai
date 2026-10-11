@@ -161,6 +161,7 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 - Her ayar `os.environ.get('ANAHTAR', 'varsayilan')` deseniyle okunur.
 - `DevelopmentConfig` (`DEBUG = True`) ve `ProductionConfig` (`DEBUG = False`) + bunları seçen sözlük (`config = {'development': ..., 'production': ...}`).
 - **Kontrol noktası:** `config.py` import edilip bir ayar yazdırılabiliyor ve `.env`'deki değer geliyor.
+- ✅ 11 Ekim: tamamlandı ve test edildi. Not: `BUSINESS_CONTEXT` (chatbot'un sistem talimatı) ilk sürümdür; paket ayrıntıları ve SSS eklenerek geliştirilecek.
 
 ### Modül B — `app/database.py`
 
@@ -170,6 +171,8 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 | `init_db(app)` | `leads` tablosunu oluşturur (yoksa) |
 | `lead_ekle(isim, telefon, mesaj, etsy_magaza=None)` | `?` yer tutucularıyla yeni kayıt ekler |
 | `tum_leadler()` | Tüm kayıtları en yeniden eskiye getirir |
+
+- ✅ 11 Ekim: tamamlandı. `test_modul_b.py` ile ayrı bir `test.db` üzerinde kayıt ekleme ve listeleme test edildi. SQL enjeksiyonu denemesi (`Robert'); DROP TABLE leads;--`) tablo silinmeden düz metin olarak kaydedildi; `?` yer tutucusu çalışıyor.
 
 ### Modül C — `app/services/ai_service.py`
 - `AIService` sınıfı ve `yanit_uret(mesaj, gecmis)` metodu.
@@ -296,8 +299,8 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | Ortam + hesaplar + iskelet + duman testi | Bölüm 4 | ✅ 7 Ekim |
 | Mimari tasarım (bu belge) | — | ✅ 11 Ekim |
 | GitHub deposu + iskelet commit | Modül H (1–2) | ✅ 7 Ekim |
-| Yapılandırma | Modül A | ⬜ Belgrad öncesi |
-| Veritabanı | Modül B | ⬜ Belgrad öncesi |
+| Yapılandırma | Modül A | ✅ 11 Ekim |
+| Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ⬜ Belgrad öncesi |
 | Rotalar · Fabrika + giriş | Modül D–E | ⬜ Belgrad öncesi |
 | Çalıştırma + test | Modül F | ⬜ |
