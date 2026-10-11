@@ -1,8 +1,9 @@
 # SmartLead AI · AST Digital
 ## Ortam Kurulumu ve Mimari Tasarım Envanteri
 
-**Hazırlayan:** Abdulsamed Tanrıverdi · **Marka:** AST Digital · **Tarih:** 7 Ekim 2026
+**Hazırlayan:** Abdulsamed Tanrıverdi · **Marka:** AST Digital · **Güncelleme:** 11 Ekim 2026
 **Eğitim:** Python ile Ürün Geliştirme · **Revize:** salih@humanports.com
+**Dayanak:** SmartLead AI Öğrenci Proje Yönergesi (Bölüm 1–7)
 
 ---
 
@@ -10,17 +11,19 @@
 
 SmartLead AI, AST Digital'in web sitesinde (Wix Studio) çalışan **akıllı satış asistanıdır**. AST Digital, Etsy'de satış yapan ya da yapmak isteyen üreticilere (tişört, kupa, tumbler gibi baskılı ve kişiye özel ürün satıcıları) dijital araçlar ve birebir danışmanlık sunar.
 
-Asistanın üç görevi vardır:
+Asistanın görevleri:
 
 1. Ziyaretçinin Etsy, listing, mockup ve paketlerle ilgili sorularını marka diliyle yanıtlamak.
 2. Ziyaretçiyi ihtiyacına uygun pakete (Freemium / Premium) yönlendirmek.
-3. Ziyaretçinin iletişim bilgisini (lead) toplayıp veritabanına kaydetmek ve işletme sahibinin bu kayıtları yönetim panelinde görmesini sağlamak.
+3. Ziyaretçinin iletişim bilgisini (lead) toplayıp veritabanına kaydetmek; işletme sahibinin bu kayıtları yönetim panelinde görmesini sağlamak.
 
-Sistem iki arayüzden oluşur: ziyaretçinin sohbet ettiği **karşılama sayfası / sohbet penceresi** ve işletme sahibinin lead'leri gördüğü **yönetim paneli**.
+Sistem iki arayüzden oluşur: ziyaretçinin sohbet edip bilgi bıraktığı **Karşılama Sayfası (B2C)** ve işletme sahibinin lead'leri gördüğü **Yönetim Paneli (B2B)**.
+
+Yönergeye göre **mimari (klasörler, katmanlar, kurallar) sabittir; değişen tek şey konudur.** AST Digital'e özel olan kısımlar yalnızca `BUSINESS_CONTEXT` metni, `leads` tablosundaki tek ek sütun ve arayüz metinleridir.
 
 ---
 
-## 2. Ortam Kurulumu
+## 2. Ortam Kurulumu (Yönerge Bölüm 4 — Oturum Öncesi Hazırlık)
 
 ### 2.1 Hazırım Kontrol Listesi
 
@@ -28,9 +31,8 @@ Sistem iki arayüzden oluşur: ziyaretçinin sohbet ettiği **karşılama sayfas
 |---|---|---|
 | 1 | `py -3.11 --version` → Python 3.11.9 | ✅ |
 | 2 | `git --version` → git 2.53.0 | ✅ |
-| 3 | GitHub, Render, Wix hesapları açık | ✅ |
-| 3b | Groq hesabı açık | ⬜ |
-| 4 | Groq API anahtarı alındı ve `.env` içine kaydedildi | ⬜ |
+| 3 | GitHub + Render + Wix + Groq hesapları açık | ✅ |
+| 4 | Groq API anahtarı (`gsk_...`) alındı ve `.env` içine kaydedildi | ✅ |
 | 5 | Klasör iskeleti hazır (Bölüm 3) | ✅ |
 | 6 | `venv` aktif, `pip install -r requirements.txt` hatasız tamamlandı | ✅ |
 | 7 | Duman testi tarayıcıda çalıştı | ✅ |
@@ -38,7 +40,7 @@ Sistem iki arayüzden oluşur: ziyaretçinin sohbet ettiği **karşılama sayfas
 ### 2.2 Kurulum Adımları (Windows · PowerShell)
 
 ```powershell
-# Proje klasörü: C:\Users\samet\OneDrive\Desktop\SMARTLEAD.AI
+# Proje klasörü: ...\Desktop\SMARTLEAD.AI  (TNC-PROGRAM deposunun dışında, ayrı git deposu)
 mkdir app, app\templates, app\services
 New-Item run.py, config.py, requirements.txt, .env, .gitignore, `
   app\__init__.py, app\database.py, app\routes.py, `
@@ -50,19 +52,19 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**Kurulu paketler:** flask 3.1.3 · flask-cors 6.0.5 · python-dotenv 1.2.4 · groq 1.7.0 · gunicorn 26.2.0
+**`requirements.txt`:** `flask` · `flask-cors` · `python-dotenv` · `requests` · `gunicorn`
 
-> Python 3.14 de bilgisayarda kurulu, ancak bazı paketlerin henüz tam uyumlu olmaması ihtimaline karşı sanal ortam bilinçli olarak **Python 3.11** ile kuruldu.
+> Bilgisayarda Python 3.14 de kurulu; bazı paketlerin henüz tam uyumlu olmaması ihtimaline karşı sanal ortam bilinçli olarak **Python 3.11** ile kuruldu.
 
 ### 2.3 Duman Testi
 
-`hello.py` (proje dosyası değil, yalnızca ortam testi) çalıştırıldı, tarayıcıda "Ortam calisiyor!" yanıtı alındı. 5000 portu bilgisayarda başka bir uygulama tarafından kullanıldığı için test 5110 portunda yapıldı.
+`hello.py` (proje dosyası değil, yalnızca ortam testi) çalıştırıldı; tarayıcıda "Ortam calisiyor!" yanıtı alındı. 5000 portu bilgisayarda başka bir uygulama tarafından kullanıldığı için test **5110** portunda yapıldı.
 
 ![Duman testi](duman-testi.png)
 
 ---
 
-## 3. Klasör Yapısı ve Dosya Sorumlulukları
+## 3. Hedef Mimari: Klasör Yapısı ve Sorumluluklar
 
 ```
 SMARTLEAD.AI/
@@ -70,16 +72,19 @@ SMARTLEAD.AI/
 ├── config.py              ← Tüm ayarlar ve anahtarlar (.env okur)
 ├── requirements.txt       ← Bağımlılık listesi
 ├── .env                   ← Gizli anahtarlar (Git'e EKLENMEZ)
+├── .env.example           ← .env'in anahtarsız örneği (Git'e eklenir)
 ├── .gitignore             ← venv/, .env, __pycache__/, *.db
+├── README.md
 ├── docs/
-│   └── MIMARI.md          ← Bu belge
+│   ├── MIMARI.md          ← Bu belge
+│   └── duman-testi.png
 └── app/
-    ├── __init__.py        ← Uygulama fabrikası: create_app()
+    ├── __init__.py        ← Uygulama fabrikası: create_app() + /health
     ├── database.py        ← SQLite işlemleri (SQL SADECE burada)
     ├── routes.py          ← HTTP rotaları (sadece yönlendirme)
     ├── templates/
-    │   ├── index.html     ← Karşılama sayfası + sohbet penceresi
-    │   └── dashboard.html ← Yönetim paneli
+    │   ├── index.html     ← Karşılama sayfası (yerel test arayüzü)
+    │   └── dashboard.html ← Yönetim paneli (yerel test arayüzü)
     └── services/
         ├── __init__.py
         └── ai_service.py  ← Yapay zekâ çağrıları (AI SADECE burada)
@@ -87,11 +92,11 @@ SMARTLEAD.AI/
 
 | Dosya | Tek sorumluluğu | Kesinlikle içermez |
 |---|---|---|
-| `config.py` | `.env`'den ayarları okuyup `Config` sınıfında toplamak | SQL, AI çağrısı, rota |
-| `app/database.py` | Tabloyu oluşturmak, lead eklemek, lead listelemek | AI çağrısı, HTTP |
-| `app/services/ai_service.py` | Groq'a istek atıp asistanın cevabını döndürmek | SQL, HTTP rotası |
-| `app/routes.py` | İsteği karşılamak, doğrulamak, ilgili katmanı çağırmak, JSON döndürmek | SQL metni, Groq istemcisi |
-| `app/__init__.py` | Flask uygulamasını kurmak, CORS'u ayarlamak, rotaları kaydetmek, veritabanını başlatmak | İş mantığı |
+| `config.py` | `.env`'den ayarları okuyup `Config` sınıflarında toplamak | SQL, AI çağrısı, rota |
+| `app/database.py` | Bağlantı, tablo oluşturma, lead ekleme ve listeleme | AI çağrısı, HTTP |
+| `app/services/ai_service.py` | Groq'a istek atıp asistanın yanıtını döndürmek | Flask, HTTP, SQL |
+| `app/routes.py` | İsteği karşılamak, doğrulamak, ilgili katmanı çağırmak, JSON döndürmek | SQL metni, Groq isteği |
+| `app/__init__.py` | Ayarları yüklemek, CORS'u açmak, veritabanını başlatmak, Blueprint'leri kaydetmek | İş mantığı |
 | `run.py` | `create_app()` ile uygulamayı oluşturup çalıştırmak | Her şey dışında |
 
 **Mimari sözleşme:** `database.py` dışında hiçbir yerde SQL yoktur. `ai_service.py` dışında hiçbir yerde yapay zekâ API çağrısı yoktur. `routes.py` yalnızca bu iki katmanın fonksiyonlarını çağırır.
@@ -102,109 +107,117 @@ SMARTLEAD.AI/
 
 ```mermaid
 sequenceDiagram
-    participant Z as Ziyaretçi (Wix sitesi)
-    participant W as Wix (HTML embed / Velo)
+    participant Z as Ziyaretçi (Wix Karşılama Sayfası)
+    participant W as Wix Velo (wix-fetch)
     participant R as routes.py (Render)
     participant AI as ai_service.py
     participant G as Groq API
     participant DB as database.py (SQLite)
 
-    Z->>W: Soru yazar
-    W->>R: POST /api/chat {message, history}
-    R->>AI: get_ai_response(message, history)
-    AI->>G: chat.completions (BUSINESS_CONTEXT + mesajlar)
-    G-->>AI: cevap
+    Z->>W: Soru yazar, "Sor"a basar
+    W->>R: POST /api/sohbet {mesaj, gecmis}
+    R->>AI: ai_service.yanit_uret(mesaj, gecmis)
+    AI->>G: requests.post (system + geçmiş + yeni mesaj)
+    G-->>AI: yanıt
     AI-->>R: metin
-    R-->>W: {ok: true, reply}
-    W-->>Z: Asistanın cevabı
+    R-->>W: {basari: true, cevap}
+    W-->>Z: Asistanın yanıtı
 
-    Z->>W: Ad, WhatsApp, Etsy mağazası, paket
-    W->>R: POST /api/leads {...}
-    R->>DB: add_lead(data)
-    DB-->>R: lead_id
-    R-->>W: {ok: true, id}
+    Z->>W: İsim, telefon, Etsy mağazası, "Kaydet"
+    W->>R: POST /api/leads {isim, telefon, mesaj, etsy_magaza}
+    R->>DB: lead_ekle(...)
+    DB-->>R: tamam
+    R-->>W: 201 {basari: true}
 
-    Note over W,R: Yönetim paneli: Wix Velo backend → GET /api/leads (X-Admin-Token)
+    Note over W,R: Yönetim Paneli: GET /api/leads → Repeater
 ```
 
 ---
 
-## 5. Veri Modeli
+## 5. Veri Modeli (Yönerge Modül B)
 
-Tek tablo: **`leads`**
+Tek tablo: **`leads`** — yönergedeki zorunlu şema + AST Digital'e özel **tek ek sütun**.
 
 | Alan | Tür | Kural | Açıklama |
 |---|---|---|---|
 | `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | Kayıt numarası |
-| `name` | TEXT | NOT NULL | Ad soyad |
-| `phone` | TEXT | | WhatsApp numarası |
-| `email` | TEXT | | E-posta |
-| `etsy_shop` | TEXT | | Etsy mağaza bağlantısı |
-| `interest` | TEXT | `freemium` / `premium` / `bilinmiyor` | İlgilendiği paket |
-| `message` | TEXT | | Ziyaretçinin notu veya sohbet özeti |
-| `source` | TEXT | `chatbot` / `form` | Lead'in geldiği yer |
-| `status` | TEXT | varsayılan `yeni` | `yeni` → `iletisime_gecildi` → `onaylandi` / `reddedildi` |
-| `created_at` | TEXT | varsayılan `CURRENT_TIMESTAMP` | Kayıt zamanı |
+| `isim` | TEXT | NOT NULL | Ad soyad |
+| `telefon` | TEXT | NOT NULL | WhatsApp numarası |
+| `mesaj` | TEXT | opsiyonel | Ziyaretçinin notu |
+| `etsy_magaza` | TEXT | opsiyonel — **AST Digital'e özel ek sütun** | Etsy mağaza bağlantısı (başvuru değerlendirmesi için) |
+| `tarih` | TIMESTAMP | `DEFAULT CURRENT_TIMESTAMP` | Kayıt zamanı |
 
-**Kural:** `phone` veya `email` alanlarından en az biri dolu olmalıdır (iletişim kurulamayan lead kaydedilmez). Bu kontrol `routes.py`'de yapılır.
+Yönergenin izin verdiği kişiselleştirme ("restoran için `kisi_sayisi`, emlak için `butce`") AST Digital'de `etsy_magaza` olarak uygulanır; fonksiyonlar ve form bu sütuna göre güncellenir.
 
 ---
 
-## 6. API Rotaları
+## 6. Modüllerin Fonksiyonları (Yönerge Modül A–E)
 
-| Metot | Yol | Girdi | Başarılı çıktı | Kim kullanır |
+Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne içermesi gerektiğinin** tanımıdır.
+
+### Modül A — `config.py`
+- Dosyanın başında `load_dotenv()`.
+- `Config` sınıfı: `SECRET_KEY`, `DATABASE_URL` (varsayılan `smartlead.db`), `GROQ_API_KEY`, `AI_PROVIDER` (`groq`), `BUSINESS_CONTEXT`, `CORS_ORIGINS`.
+- Her ayar `os.environ.get('ANAHTAR', 'varsayilan')` deseniyle okunur.
+- `DevelopmentConfig` (`DEBUG = True`) ve `ProductionConfig` (`DEBUG = False`) + bunları seçen sözlük (`config = {'development': ..., 'production': ...}`).
+- **Kontrol noktası:** `config.py` import edilip bir ayar yazdırılabiliyor ve `.env`'deki değer geliyor.
+
+### Modül B — `app/database.py`
+
+| Fonksiyon | Görevi |
+|---|---|
+| `get_db()` | Veritabanına bağlanır; `row_factory` ile satırlara sütun adıyla erişim sağlar |
+| `init_db(app)` | `leads` tablosunu oluşturur (yoksa) |
+| `lead_ekle(isim, telefon, mesaj, etsy_magaza=None)` | `?` yer tutucularıyla yeni kayıt ekler |
+| `tum_leadler()` | Tüm kayıtları en yeniden eskiye getirir |
+
+### Modül C — `app/services/ai_service.py`
+- `AIService` sınıfı ve `yanit_uret(mesaj, gecmis)` metodu.
+- `BUSINESS_CONTEXT`'i config'den okuyan yardımcı metot.
+- Groq'a **`requests.post`** ile istek atan metot — model: **`llama-3.1-8b-instant`**.
+- `messages` sırası: önce sistem talimatı (`role: system`), sonra geçmiş mesajlar, en sonda yeni kullanıcı mesajı.
+- Anahtar yoksa çökmek yerine **"demo modu"** mesajı döndürür.
+- Servise özel hata sınıfı `AIServiceError`; istek `try-except` ile sarılır, hata olursa `AIServiceError` fırlatılır.
+- Dosya sonunda tek örnek: `ai_service = AIService()`.
+- Bu dosya Flask, HTTP veya veritabanı kavramlarını bilmez; sağlayıcı değişikliği (Groq → Gemini) yalnızca burayı etkiler.
+
+### Modül D — `app/routes.py`
+- İki Blueprint: **sayfalar** (`/`, `/dashboard`) ve **API** (`url_prefix='/api'`).
+- Her API uç noktası `basari` alanı içeren JSON döndürür.
+- Durum kodları: eksik veri **400**, AI hatası **503**, yeni kayıt **201**.
+- `AIServiceError` yakalanıp kibar JSON hata döndürülür.
+
+### Modül E — `app/__init__.py` + `run.py`
+- `create_app()` sırası: ayarları yükle → CORS aç → `with app.app_context(): init_db(app)` → Blueprint'leri kaydet → uygulamayı döndür.
+- `/health` uç noktası (canlılık kontrolü).
+- `run.py`: `app = create_app()` · `if __name__ == '__main__': app.run(port=5110, debug=True)` · Render'da `gunicorn run:app`.
+
+---
+
+## 7. API Uç Noktaları (Yönerge Modül D)
+
+| Metot + Yol | Görevi | Çağırdığı katman | Girdi | Başarılı çıktı |
 |---|---|---|---|---|
-| GET | `/` | — | `index.html` | Ziyaretçi (test) |
-| GET | `/dashboard` | — | `dashboard.html` | İşletme sahibi (test) |
-| GET | `/health` | — | `{"ok": true}` | Render sağlık kontrolü |
-| POST | `/api/chat` | `{"message": str, "history": [ {role, content} ]}` | `{"ok": true, "reply": str}` | Sohbet penceresi |
-| POST | `/api/leads` | `{"name", "phone", "email", "etsy_shop", "interest", "message", "source"}` | `{"ok": true, "id": int}` (201) | Sohbet penceresi / form |
-| GET | `/api/leads` | Başlık: `X-Admin-Token` | `{"ok": true, "leads": [...]}` | Yönetim paneli |
+| GET `/` | Karşılama sayfası | `render_template` | — | `index.html` |
+| GET `/dashboard` | Yönetim paneli | `render_template` | — | `dashboard.html` |
+| POST `/api/sohbet` | AI'a mesaj iletir | `ai_service.yanit_uret()` | `{"mesaj": str, "gecmis": [...]}` | `{"basari": true, "cevap": str}` |
+| POST `/api/leads` | Yeni lead kaydeder | `database.lead_ekle()` | `{"isim", "telefon", "mesaj", "etsy_magaza"}` | 201 `{"basari": true}` |
+| GET `/api/leads` | Tüm lead'leri getirir | `database.tum_leadler()` | — | `{"basari": true, "leadler": [...]}` |
+| GET `/health` | Canlılık kontrolü | — | — | `{"durum": "aktif"}` |
 
-**Hata formatı (tüm rotalarda aynı):**
+**Hata formatı (tüm API uç noktalarında aynı):**
 
 ```json
-{ "ok": false, "error": "Kullanıcıya gösterilebilecek kısa açıklama" }
+{ "basari": false, "hata": "Kullanıcıya gösterilebilecek kısa açıklama" }
 ```
 
-| Durum | HTTP kodu |
-|---|---|
-| Eksik / hatalı girdi | 400 |
-| Admin anahtarı yok veya yanlış | 401 |
-| Veritabanı veya AI servisi hatası | 500 (ayrıntı loglanır, kullanıcıya gösterilmez) |
-
----
-
-## 7. Modüllerin Fonksiyonları
-
-Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne yapması gerektiğinin** tanımıdır.
-
-**`config.py` → `class Config`**
-`SECRET_KEY`, `DATABASE_URL` (varsayılan `smartlead.db`), `GROQ_API_KEY`, `AI_PROVIDER` (`groq`), `AI_MODEL`, `BUSINESS_CONTEXT`, `CORS_ORIGINS` (virgülle ayrılmış liste), `ADMIN_TOKEN`. Hepsi `os.getenv` ile `.env`'den okunur.
-
-**`app/database.py`**
-- `init_db()` → `leads` tablosunu yoksa oluşturur.
-- `add_lead(data: dict) -> int` → `?` yer tutucularıyla INSERT yapar, yeni kaydın id'sini döndürür.
-- `get_leads(limit: int = 100) -> list[dict]` → En yeni kayıtları sözlük listesi olarak döndürür.
-- (Belgrad aşaması) `update_lead_status(lead_id, status)`.
-
-**`app/services/ai_service.py`**
-- `get_ai_response(message: str, history: list) -> str` → `BUSINESS_CONTEXT`'i sistem mesajı yapar, son birkaç mesajlık geçmişi ve yeni mesajı Groq'a gönderir, cevabın metnini döndürür. Hata olursa istisnayı yukarı fırlatır; `routes.py` bunu kibar bir JSON hataya çevirir.
-
-**`app/routes.py`**
-- Her rota: girdiyi doğrula → ilgili katmanı çağır → `jsonify` ile döndür. Tüm dış çağrılar `try-except` içinde.
-
-**`app/__init__.py` → `create_app()`**
-- `Config`'i yükler, `CORS(app, origins=Config.CORS_ORIGINS)` uygular, `init_db()` çağırır, rotaları Blueprint olarak kaydeder.
-
-**`run.py`**
-- `app = create_app()` · yerelde `app.run(port=5110, debug=True)` · Render'da `gunicorn run:app`.
+**Alan adları sözleşmesi (Yönerge Modül G — "Aynı Kelimeler"):** sohbet için `mesaj` / `cevap`, kayıt için `isim` / `telefon` / `mesaj` / `etsy_magaza`, liste için `leadler`. Wix tarafı bu adları birebir kullanır.
 
 ---
 
 ## 8. Asistanın Kişiliği: `BUSINESS_CONTEXT`
 
-Kodun konuya özel tek parçası budur. Diğer tüm katmanlar başka bir marka için aynen kullanılabilir.
+Kodun konuya özel tek parçası budur.
 
 ```python
 BUSINESS_CONTEXT = """Sen AST Digital'in asistanisin. AST Digital, Etsy'de satis yapan
@@ -223,72 +236,75 @@ Kurallar:
 - Turkce, samimi, net ve cesaret veren bir dille konus. Kisa yanit ver (en fazla 4-5 cumle).
 - Kesin satis vaat etme; yolu kisaltmayi vaat et.
 - Bilmedigin bir konuda uydurma; "Bunu ekibimiz netlestirsin" de ve iletisim bilgisi iste.
-- Konusma ilerledikce ziyaretciye uygun paketi oner ve adini, WhatsApp numarasini
-  ve Etsy magaza baglantisini birakmasini nazikce iste.
+- Konusma ilerledikce uygun paketi oner ve isim, telefon ve Etsy magaza
+  baglantisini birakmasini nazikce iste.
 - Etsy, e-ticaret ve AST Digital disindaki konulara girme."""
 ```
 
 ---
 
-## 9. Güvenlik
+## 9. Güvenlik (Değerlendirme %10)
 
 | Konu | Uygulama |
 |---|---|
 | SQL enjeksiyonu | Tüm sorgularda `?` yer tutucusu; kullanıcı verisi asla SQL metnine eklenmez. |
-| Gizli anahtarlar | `GROQ_API_KEY`, `SECRET_KEY`, `ADMIN_TOKEN` yalnızca `.env`'de (yerel) ve Render "Environment" ayarlarında. `.env` `.gitignore`'da. |
-| CORS | Yalnızca `https://astdigital.wixstudio.com` ve Wix editör/önizleme alan adlarına izin verilir; `*` kullanılmaz. |
-| Lead listesi | `GET /api/leads` `X-Admin-Token` başlığı olmadan 401 döner. Wix tarafında bu anahtar tarayıcıya hiç inmez: Velo **backend** modülünden (`wix-fetch`) çağrılır, anahtar Wix **Secrets Manager**'da tutulur. |
-| Girdi doğrulama | Boş mesaj, aşırı uzun mesaj (ör. 1000 karakter üstü) ve iletişim bilgisi olmayan lead 400 ile reddedilir. |
-| KVKK | Sohbet penceresinde lead formu gönderilmeden önce KVKK aydınlatma metnine bağlantı ve onay kutusu gösterilir (site KVKK politikasıyla uyumlu). |
+| Gizli anahtarlar | `GROQ_API_KEY`, `SECRET_KEY` yalnızca `.env`'de (yerel) ve Render "Environment" ayarlarında. `.env` `.gitignore`'da; depoda yalnızca `.env.example` bulunur. |
+| CORS | `CORS_ORIGINS` ile yalnızca `https://astdigital.wixstudio.com` ve Wix editör/önizleme alan adlarına izin verilir; `*` kullanılmaz. |
+| Girdi doğrulama | Boş mesaj, aşırı uzun mesaj (ör. 1000 karakter üstü), isim veya telefonu eksik lead → 400. |
+| KVKK | Karşılama sayfasındaki formda KVKK aydınlatma metnine bağlantı ve onay kutusu bulunur (site KVKK politikasıyla uyumlu). |
+| Lead listesi (ek, Belgrad aşaması) | `GET /api/leads` herkese açık kalmamalı; Wix tarafında Velo backend + Secrets Manager'da tutulan bir anahtarla çağrılması planlanır. |
 
 ---
 
-## 10. Hata Yönetimi
+## 10. Hata Yönetimi (Değerlendirme %10)
 
 - Veritabanı ve Groq çağrıları `try-except` ile sarılır.
-- Kullanıcıya teknik ayrıntı gösterilmez; yalnızca `{"ok": false, "error": "..."}` döner.
+- Kullanıcıya teknik ayrıntı gösterilmez; yalnızca `{"basari": false, "hata": "..."}` döner.
 - Hatanın ayrıntısı sunucu loguna yazılır (Render "Logs" ekranından izlenir).
-- Groq'a ulaşılamazsa asistan şu yedek cevabı verir: *"Şu an yanıt veremiyorum, bilgilerini bırakırsan ekibimiz WhatsApp'tan dönsün."* Böylece lead fırsatı kaçmaz.
+- Groq anahtarı yoksa asistan **demo modu** yanıtı verir; Groq'a ulaşılamazsa 503 ile kibar bir mesaj döner: *"Şu an yanıt veremiyorum, bilgilerini bırakırsan ekibimiz WhatsApp'tan dönsün."*
 
 ---
 
-## 11. Wix Bağlantısı
+## 11. Wix Bağlantısı (Yönerge Modül G)
 
-| Wix tarafı | Yöntem | Backend rotası |
-|---|---|---|
-| Sohbet penceresi (tüm sayfalarda sağ altta) | HTML embed içinde `fetch()` — ders kuralına göre HTML embed yalnızca chatbot için kullanılır | `POST /api/chat`, `POST /api/leads` |
-| Yönetim Paneli (yalnızca site sahibine açık sayfa) | Velo backend web modülü → `wix-fetch` → Repeater | `GET /api/leads` |
-| Başvuru formu (`/basvuru`) | Manuel Input + Velo → Wix CMS `Basvurular` | — (Wix içinde kalır) |
+| Arayüz | UX deseni | Bileşenler (hepsine ID verilir) | Backend |
+|---|---|---|---|
+| **Karşılama Sayfası (B2C)** | **Z-Pattern:** logo sol üst, sohbet sağ, form alt bölge. Sohbet kartında **Glassmorphism** (buzlu cam) | Mesaj girişi, "Sor" butonu, yanıt alanı; isim, telefon, Etsy mağazası girişleri, KVKK onayı, "Kaydet" butonu | `wix-fetch` → `POST /api/sohbet`, `POST /api/leads` |
+| **Yönetim Paneli (B2B)** | **F-Pattern:** en önemli kolon (isim) solda | Repeater (isim · telefon · Etsy mağazası · tarih) | `wix-fetch` → `GET /api/leads`; her objeye `_id` eklenir, satırda `$item` kullanılır |
 
-> Başvuru formu şu an Wix CMS'e, sohbet lead'leri SmartLead veritabanına kaydedilir. Belgrad aşamasında başvuru formunun da `POST /api/leads` (`source: "form"`) üzerinden aynı tabloya yazılması ve Yönetim Paneli'nin tek kaynaktan beslenmesi hedeflenir.
+Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel Input bileşenleridir.
 
 ---
 
-## 12. Yayınlama (GitHub + Render)
+## 12. Yayınlama (Yönerge Modül H)
 
-1. **GitHub:** `SMARTLEAD.AI` klasörü ayrı bir depo olarak yüklenir (`smartlead-ai`). `.env` ve `venv/` yüklenmez.
-2. **Render → New Web Service:** GitHub deposu bağlanır.
+1. **GitHub:** ayrı, public depo — **github.com/Allahverdyy/smartlead-ai**. `.env` ve `venv/` yüklenmez. ✅
+2. **Render → New Web Service:** depo bağlanır.
    - Build: `pip install -r requirements.txt`
    - Start: `gunicorn run:app`
-   - Environment: `GROQ_API_KEY`, `SECRET_KEY`, `ADMIN_TOKEN`, `CORS_ORIGINS`, `AI_MODEL`
-3. Canlı adres (`https://smartlead-ai-xxxx.onrender.com/health`) `{"ok": true}` döndürünce Wix tarafına bağlanır.
+   - Environment: `GROQ_API_KEY`, `SECRET_KEY`, `CORS_ORIGINS`
+3. `https://<servis>.onrender.com/health` → `{"durum": "aktif"}` dönünce Wix kodundaki API adresi Render adresiyle güncellenir.
 
-**Bilinen kısıt:** Render'ın ücretsiz planında disk kalıcı değildir; her yeniden yayınlamada SQLite dosyası sıfırlanabilir ve servis 15 dakika boşta kalınca uykuya geçip ilk istekte geç uyanır. MVP ve jüri sunumu için kabul edilebilir; gerçek kullanımda kalıcı bir veritabanına (ör. Render PostgreSQL) geçilecektir. Mimari bu geçişe hazırdır: yalnızca `database.py` değişir.
-
----
-
-## 13. Durum ve Sonraki Adımlar
-
-| Adım | Durum |
-|---|---|
-| Ortam kurulumu + duman testi | ✅ 7 Ekim |
-| Mimari tasarım (bu belge) | ✅ 7 Ekim |
-| Groq hesabı ve API anahtarı | ⬜ |
-| GitHub deposu + ilk commit (iskelet + bu belge) | ⬜ |
-| Modül A–E: config, database, ai_service, routes, create_app | ⬜ Belgrad öncesi |
-| Render'da canlı `/health` ve `/api/chat` | ⬜ Belgrad öncesi |
-| Wix sohbet penceresi + Yönetim Paneli | ⬜ Belgrad |
+**Bilinen kısıt:** Render'ın ücretsiz planında disk kalıcı değildir; yeniden yayında SQLite dosyası sıfırlanabilir ve servis 15 dakika boşta kalınca uykuya geçer. MVP ve jüri sunumu için kabul edilebilir; kalıcı kullanımda PostgreSQL'e geçilir. Mimari buna hazırdır: yalnızca `database.py` değişir.
 
 ---
 
-*Bu belgenin yapısı ve taslak metni hazırlanırken yapay zekâ desteği (Claude) kullanılmıştır; mimari kararlar ve kod öğrenci tarafından sahiplenilmiş ve sözlü olarak açıklanabilecek şekilde gözden geçirilmiştir.*
+## 13. Durum ve Zaman Çizelgesi (Yönerge Bölüm 6)
+
+| Aşama | Modül | Durum |
+|---|---|---|
+| Ortam + hesaplar + iskelet + duman testi | Bölüm 4 | ✅ 7 Ekim |
+| Mimari tasarım (bu belge) | — | ✅ 11 Ekim |
+| GitHub deposu + iskelet commit | Modül H (1–2) | ✅ 7 Ekim |
+| Yapılandırma | Modül A | ⬜ Belgrad öncesi |
+| Veritabanı | Modül B | ⬜ Belgrad öncesi |
+| Yapay zekâ servisi | Modül C | ⬜ Belgrad öncesi |
+| Rotalar · Fabrika + giriş | Modül D–E | ⬜ Belgrad öncesi |
+| Çalıştırma + test | Modül F | ⬜ |
+| Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
+| Render'da canlı yayın | Modül H (3–5) | ⬜ Belgrad öncesi |
+| README son hali, sunum/demo | Teslim | ⬜ 27 Ekim jüri |
+
+---
+
+*Bu belgenin yapısı ve taslak metni hazırlanırken yapay zekâ desteği (Claude) kullanılmıştır; mimari kararlar öğrenci tarafından sahiplenilmiş, kod öğrenci tarafından yazılacak ve sözlü olarak açıklanabilecek şekilde gözden geçirilecektir.*
