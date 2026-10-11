@@ -2,7 +2,7 @@
 
 AST Digital'in web sitesinde çalışan **akıllı satış asistanı**: Etsy satıcılarının sorularını yanıtlar, onları uygun pakete yönlendirir ve iletişim bilgilerini (lead) toplar. İşletme sahibi bu kayıtları yönetim panelinde görür.
 
-**Teknolojiler:** Python 3.11 · Flask · SQLite · Groq (llama-3.1-8b-instant) · Wix Velo · Render
+**Teknolojiler:** Python 3.11 · Flask · SQLite · Groq (openai/gpt-oss-20b) · Wix Velo · Render
 
 > TNC Group · Proje Uzmanı Yetiştirme Programı — Python ile Ürün Geliştirme projesi.
 > Mimari tasarım ve ortam kurulumu: **[docs/MIMARI.md](docs/MIMARI.md)**

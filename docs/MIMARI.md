@@ -177,12 +177,15 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 ### Modül C — `app/services/ai_service.py`
 - `AIService` sınıfı ve `yanit_uret(mesaj, gecmis)` metodu.
 - `BUSINESS_CONTEXT`'i config'den okuyan yardımcı metot.
-- Groq'a **`requests.post`** ile istek atan metot — model: **`llama-3.1-8b-instant`**.
+- Groq'a **`requests.post`** ile istek atan metot — model: **`openai/gpt-oss-20b`** (`GROQ_MODEL` ortam değişkeninden okunur).
+- **Yönergeden bilinçli sapma:** Yönergedeki `llama-3.1-8b-instant` modeli Groq tarafından 16 Ağustos 2026'da kapatıldı (API 404 döndürüyor). Groq'un önerdiği yerine geçen model `openai/gpt-oss-20b` kullanıldı. Model adı koda gömülmek yerine config'e taşındı; ileride bir model daha kapanırsa yalnızca ortam değişkeni değişir. Kaynak: https://console.groq.com/docs/deprecations
 - `messages` sırası: önce sistem talimatı (`role: system`), sonra geçmiş mesajlar, en sonda yeni kullanıcı mesajı.
 - Anahtar yoksa çökmek yerine **"demo modu"** mesajı döndürür.
 - Servise özel hata sınıfı `AIServiceError`; istek `try-except` ile sarılır, hata olursa `AIServiceError` fırlatılır.
 - Dosya sonunda tek örnek: `ai_service = AIService()`.
 - Bu dosya Flask, HTTP veya veritabanı kavramlarını bilmez; sağlayıcı değişikliği (Groq → Gemini) yalnızca burayı etkiler.
+- ✅ 11 Ekim: tamamlandı. `test_modul_c.py` ile 4 test: gerçek soru, konuşma geçmişini hatırlama, anahtarsız demo modu, yanlış anahtarda `AIServiceError` (401) yakalama.
+- **Test sırasında bulunan sorun ve çözümü:** İlk sürümde model olmayan bir üyelik linki uydurdu, pakette olmayan hizmetler (stok yönetimi, otomatik fiyat güncelleme) vaat etti ve Markdown kullandı. Çözüm: `BUSINESS_CONTEXT`'e gerçek paket içerikleri, izin verilen tek link/e-posta ve kurallar (uydurma yok, satış garantisi yok, düz metin, kısa cevap) eklendi; ayrıca cevaplar `_temizle()` ile Markdown yıldızlarından arındırılıyor (talimata güvenmek yerine kodda garanti).
 
 ### Modül D — `app/routes.py`
 - İki Blueprint: **sayfalar** (`/`, `/dashboard`) ve **API** (`url_prefix='/api'`).
@@ -301,7 +304,7 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | GitHub deposu + iskelet commit | Modül H (1–2) | ✅ 7 Ekim |
 | Yapılandırma | Modül A | ✅ 11 Ekim |
 | Veritabanı | Modül B | ✅ 11 Ekim |
-| Yapay zekâ servisi | Modül C | ⬜ Belgrad öncesi |
+| Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
 | Rotalar · Fabrika + giriş | Modül D–E | ⬜ Belgrad öncesi |
 | Çalıştırma + test | Modül F | ⬜ |
 | Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
