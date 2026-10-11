@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yönetim Paneli · SmartLead AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0F1B33; --mercan:#FF6B4A; --krem:#F2E9DA; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Inter, sans-serif; background:var(--krem); color:var(--navy); padding:32px; }
+  h1 { font-family:Sora, sans-serif; font-size:24px; }
+  .ust { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:12px; flex-wrap:wrap; }
+  .ozet { color:var(--mercan); font-weight:600; margin-top:4px; }
+  input, button { padding:9px 12px; border-radius:8px; font:inherit; font-size:14px; }
+  input { border:1px solid #d9ccb6; }
+  button { background:var(--navy); color:#fff; border:0; cursor:pointer; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; font-size:14px; }
+  th { background:var(--navy); color:var(--krem); text-align:left; padding:12px; font-weight:600; }
+  td { padding:12px; border-bottom:1px solid #eee3d2; vertical-align:top; }
+  #durum { margin-top:12px; color:#a3301a; }
+</style>
+</head>
+<body>
+  <div class="ust">
+    <div>
+      <h1>Yönetim Paneli</h1>
+      <div class="ozet" id="ozet">Yükleniyor...</div>
+    </div>
+    <div>
+      <input id="anahtar" type="password" placeholder="Yönetici anahtarı (canlıda)">
+      <button id="yenile">Yenile</button>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>İsim</th><th>Telefon</th><th>Etsy Mağazası</th><th>Mesaj</th><th>Tarih</th></tr></thead>
+    <tbody id="satirlar"></tbody>
+  </table>
+  <div id="durum"></div>
+<script>
+  async function yukle() {
+    const durum = document.getElementById('durum');
+    durum.textContent = '';
+    try {
+      const yanit = await fetch('/api/leads', {
+        headers: { 'X-Admin-Key': document.getElementById('anahtar').value }
+      });
+      const veri = await yanit.json();
+      if (!veri.basari) { durum.textContent = veri.hata; return; }
+      document.getElementById('ozet').textContent = veri.adet + ' potansiyel müşteri';
+      const govde = document.getElementById('satirlar');
+      govde.innerHTML = '';
+      for (const l of veri.leadler) {
+        const tr = document.createElement('tr');
+        for (const deger of [l.id, l.isim, l.telefon, l.etsy_magaza || '—', l.mesaj || '—', l.tarih]) {
+          const td = document.createElement('td');
+          td.textContent = deger;         // XSS'e karşı güvenli
+          tr.appendChild(td);
+        }
+        govde.appendChild(tr);
+      }
+    } catch {
+      durum.textContent = 'Sunucuya ulaşılamadı.';
+    }
+  }
+  document.getElementById('yenile').addEventListener('click', yukle);
+  yukle();
+</script>
+</body>
+</html>

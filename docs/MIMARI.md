@@ -192,11 +192,33 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 - Her API uç noktası `basari` alanı içeren JSON döndürür.
 - Durum kodları: eksik veri **400**, AI hatası **503**, yeni kayıt **201**.
 - `AIServiceError` yakalanıp kibar JSON hata döndürülür.
+- ✅ 11 Ekim: tamamlandı. Ek olarak:
+  - **Girdi doğrulama (sunucuda):** isim yalnızca harf/boşluk/`.'-` (2–100), telefon yalnızca rakam/boşluk/`+()-` (10–13 hane, tek biçimde saklanır), Etsy mağaza adı 4–20 harf/rakam. Tarayıcı izinsiz karakteri hiç yazdırmaz; asıl kontrol sunucudadır.
+  - **`ADMIN_KEY`:** `GET /api/leads` müşteri telefonlarını döndürdüğü için canlıda yalnızca `X-Admin-Key` başlığıyla erişilebilir (401); KVKK metniyle tutarlı.
+  - Yerel arayüz (`index.html`): marka avatarı, "yazıyor…" animasyonu (en az 2–4 sn), katlanır "Size dönüş yapalım" formu; tüm metinler `textContent` ile basılır (XSS'e karşı).
 
 ### Modül E — `app/__init__.py` + `run.py`
 - `create_app()` sırası: ayarları yükle → CORS aç → `with app.app_context(): init_db(app)` → Blueprint'leri kaydet → uygulamayı döndür.
 - `/health` uç noktası (canlılık kontrolü).
 - `run.py`: `app = create_app()` · `if __name__ == '__main__': app.run(port=5110, debug=True)` · Render'da `gunicorn run:app`.
+- ✅ 11 Ekim: tamamlandı. Ortam `APP_ENV` ile seçilir (yerelde development, Render'da production). CORS yalnızca `/api/*` için ve yalnızca `CORS_ORIGINS` listesindeki alan adlarına açık; başka site engellenir (test edildi).
+
+---
+
+## ⚠️ MUTLAKA DÖNÜLECEK — Chatbot ince ayarı (Belgrad öncesi)
+
+> Bu bölüm bitmeden sunuma çıkılmaz. Her maddeyi çözünce `test_sinirlar.py`'ye test olarak ekle ve işaretle.
+
+**Bugüne kadar bulunan ve çözülenler (11 Ekim):** uydurma link · pakette olmayan hizmet vaadi · Markdown · imza · konu dışına çıkma · "hatırlıyorum" yalanı · fazla katı kalıp red · gri alanı (+18 ürün) reddetme · marka/telif riski (FIFA, World Cup, "Official") · 30+ etiket · ikinci örneği bedava verme (kod kapısıyla).
+
+**Açık kalanlar:**
+- [ ] İlk tadımlık örnekte etiket sayısı (en fazla 5) ve açıklama yazmama kuralı da kodla garanti altına alınmalı (şu an yalnızca talimat).
+- [ ] Ret mesajları tekrar edince robotik duruyor (aynı cümle art arda) — varyasyon gerekiyor.
+- [ ] Etiket kalitesi: bitişik yazım, ürünle ilgisiz kelimeler (ör. "military shirt") — gözlemlenecek.
+- [ ] Sohbette isim/telefon yazan kullanıcı: bot formu gösteriyor ama bilgiyi kaydetmiyor; kaçan lead olabilir.
+- [ ] Hitap tutarlılığı (sen/siz karışıyor) — "siz" sabitlenecek.
+- [ ] `gpt-oss-120b` ile karşılaştırma testi: kurala uyum / hız / kota.
+- [ ] Kötüye kullanım sınırı (aynı kişinin dakikada çok istek atması → Groq kotası) — rate limit değerlendirilecek.
 
 ---
 
@@ -305,8 +327,9 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | Yapılandırma | Modül A | ✅ 11 Ekim |
 | Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
-| Rotalar · Fabrika + giriş | Modül D–E | ⬜ Belgrad öncesi |
-| Çalıştırma + test | Modül F | ⬜ |
+| Rotalar · Fabrika + giriş | Modül D–E | ✅ 11 Ekim |
+| Çalıştırma + test | Modül F | 🟡 Kısmen (`test_modul_b/c`, `test_sinirlar`) |
+| Chatbot ince ayarı | — | ⚠️ Açık maddeler var (yukarıda) |
 | Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
 | Render'da canlı yayın | Modül H (3–5) | ⬜ Belgrad öncesi |
 | README son hali, sunum/demo | Teslim | ⬜ 27 Ekim jüri |
