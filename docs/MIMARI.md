@@ -207,11 +207,22 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 
 ## Modül F — Testler
 
-- `python -m pytest -v` → **22 test**, Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
+- `python -m pytest -v` → **24 test**, Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
 - `tests/test_api.py` (16): `/health`, sayfalar, `/api/sohbet` (400 / 200 demo / 503), `/api/leads` (201, telefon standardı, geçersiz isim/telefon/mağaza → 400, SQL enjeksiyonu, sıralama), `ADMIN_KEY` (401/200), CORS (Wix izinli, başka site engelli).
 - `tests/test_ai_service.py` (6): demo modu, mesaj sırası ve 10 mesaj sınırı, sahte `system` mesajının sızmaması, Markdown temizliği, ikinci örneği durduran kod kapısı.
 - **Testin yakaladığı hata:** Markdown temizliği Groq isteği fonksiyonunun içindeydi; tüm cevapların geçtiği `yanit_uret()`'e taşındı.
 - Elle çalıştırılan denemeler (gerçek Groq'a gider): `test_modul_b.py`, `test_modul_c.py`, `test_sinirlar.py` — `pytest.ini` bunları otomatik takıma almaz.
+
+---
+
+## Modül H — Canlı yayın (Render)
+
+- Adres: **https://smartlead-ai-dse5.onrender.com** · `/health` → `{"durum":"aktif"}` ✅ (11 Ekim)
+- Ayarlar: Frankfurt bölgesi, Free plan, Build `pip install -r requirements.txt`, Start `gunicorn run:app`.
+- Ortam değişkenleri (değerleri yalnızca Render panelinde): `APP_ENV=production`, `GROQ_API_KEY`, `SECRET_KEY`, `ADMIN_KEY`, `PYTHON_VERSION=3.11.9`.
+- **Canlı saldırı testi (11 Ekim):** sistem talimatı sızdırma, DAN rol yapma, hakaret, sahte fiyat onayı, rakip kötüleme, satış garantisi, İngilizce "ignore instructions", müşteri verisi isteme, sahte marka, kod yazdırma → **10/10 dayandı.** API: anahtarsız/yanlış anahtarla lead listesi 401, XSS denemesi 400, bozuk JSON 400, hata ayrıntısı sızmıyor.
+- **Canlı testte bulunan kritik sorun:** art arda 3 mesajda Groq 429 (istek sınırı) → bot ~1 dk sustu ve kullanıcıya "kod 429" gösterdi. Çözüm: 429'da kısa bekleyip bir kez yeniden deneme + anlaşılır mesaj (2 yeni test).
+- **Ücretsiz plan kısıtları:** 15 dk trafik yoksa uyur, ilk istek ~1 dk sürer. Dosya sistemi kalıcı değil → **SQLite'taki lead'ler uyku/yeniden yüklemede silinir.**
 
 ---
 
@@ -228,7 +239,10 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 - [ ] Sohbette isim/telefon yazan kullanıcı: bot formu gösteriyor ama bilgiyi kaydetmiyor; kaçan lead olabilir.
 - [ ] Hitap tutarlılığı (sen/siz karışıyor) — "siz" sabitlenecek.
 - [ ] `gpt-oss-120b` ile karşılaştırma testi: kurala uyum / hız / kota.
-- [ ] Kötüye kullanım sınırı (aynı kişinin dakikada çok istek atması → Groq kotası) — rate limit değerlendirilecek.
+- [ ] **Groq istek sınırı (yüksek öncelik):** sistem talimatı uzun → dakikalık token sınırı hızla doluyor. Talimat kısaltılmalı + IP başına istek sınırı (ör. dakikada 5 mesaj) eklenmeli. Jüride birkaç kişi aynı anda denerse bot susabilir.
+- [ ] **Lead'lerin kalıcılığı (yüksek öncelik):** Render Free'de SQLite siliniyor. Seçenekler: Modül G'de lead'i Wix CMS'e de yazmak / harici ücretsiz veritabanı. Jüri sorusuna cevap hazır olmalı.
+- [ ] **Soğuk başlangıç:** sunumdan 2 dk önce `/health` açılıp sunucu uyandırılacak (ya da 10 dk'da bir ping atan izleme servisi).
+- [ ] 404 sayfası Flask'ın İngilizce varsayılanı — JSON/Türkçe hata sayfası.
 
 ---
 
@@ -338,10 +352,10 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
 | Rotalar · Fabrika + giriş | Modül D–E | ✅ 11 Ekim |
-| Çalıştırma + test | Modül F | ✅ 11 Ekim — `pytest`: 22 otomatik test |
+| Çalıştırma + test | Modül F | ✅ 11 Ekim — `pytest`: 24 otomatik test |
 | Chatbot ince ayarı | — | ⚠️ Açık maddeler var (yukarıda) |
 | Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
-| Render'da canlı yayın | Modül H (3–5) | ⬜ Belgrad öncesi |
+| Render'da canlı yayın | Modül H (3–5) | ✅ 11 Ekim — https://smartlead-ai-dse5.onrender.com |
 | README son hali, sunum/demo | Teslim | ⬜ 27 Ekim jüri |
 
 ---

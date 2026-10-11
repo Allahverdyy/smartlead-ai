@@ -42,3 +42,26 @@ def test_normal_cevap_kod_kapisindan_gecer():
     servis._groq_istegi = lambda mesajlar: 'Kargo süresi ürüne göre değişir.'
     onceki = [{'role': 'assistant', 'content': 'Title: Cat Mug\nTags: cat mug'}]
     assert servis.yanit_uret('kargo?', onceki) == 'Kargo süresi ürüne göre değişir.'
+
+
+class _SahteYanit:
+    def __init__(self, kod, govde=None):
+        self.status_code, self._govde, self.headers = kod, govde or {}, {'retry-after': '0'}
+    def json(self):
+        return self._govde
+
+
+def test_429_bir_kez_tekrar_dener(monkeypatch):
+    yanitlar = [_SahteYanit(429), _SahteYanit(200, {'choices': [{'message': {'content': 'Tamam'}}]})]
+    monkeypatch.setattr('app.services.ai_service.requests.post', lambda *a, **k: yanitlar.pop(0))
+    assert AIService(api_key='x').yanit_uret('merhaba') == 'Tamam'
+
+
+def test_429_devam_ederse_anlasilir_hata(monkeypatch):
+    from app.services.ai_service import AIServiceError
+    monkeypatch.setattr('app.services.ai_service.requests.post', lambda *a, **k: _SahteYanit(429))
+    try:
+        AIService(api_key='x').yanit_uret('merhaba')
+        assert False, 'hata bekleniyordu'
+    except AIServiceError as e:
+        assert 'yoğunluk' in str(e) and '429' not in str(e)     # kullanıcı teknik kod görmez

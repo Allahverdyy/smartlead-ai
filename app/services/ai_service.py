@@ -1,3 +1,5 @@
+import time
+
 import requests
 from config import Config
 
@@ -44,8 +46,9 @@ class AIService:
         return any(kayit.get('role') == 'assistant' and self._ornek_iceriyor_mu(kayit.get('content', ''))
                    for kayit in (gecmis or []))
 
-    def _groq_istegi(self, mesajlar):
-        """Groq API'ye requests.post ile istek atar, cevap metnini döndürür."""
+    def _groq_istegi(self, mesajlar, deneme=1):
+        """Groq API'ye requests.post ile istek atar, cevap metnini döndürür.
+        429 (istek sınırı) gelirse kısa bekleyip bir kez daha dener."""
         try:
             yanit = requests.post(
                 GROQ_URL,
@@ -61,8 +64,15 @@ class AIService:
         except requests.exceptions.RequestException:
             raise AIServiceError('Yapay zekâ servisine bağlanılamadı.')
 
+        if yanit.status_code == 429:
+            if deneme < 2:
+                bekleme = min(float(yanit.headers.get('retry-after', 2) or 2), 5)
+                time.sleep(bekleme)
+                return self._groq_istegi(mesajlar, deneme + 1)
+            raise AIServiceError('Şu an yoğunluk var, birkaç saniye sonra tekrar dener misiniz?')
+
         if yanit.status_code != 200:
-            raise AIServiceError(f'Yapay zekâ servisi hata döndürdü (kod {yanit.status_code}).')
+            raise AIServiceError('Asistan şu an yanıt veremiyor, lütfen biraz sonra tekrar deneyin.')
 
         return yanit.json()['choices'][0]['message']['content']
 

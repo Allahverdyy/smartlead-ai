@@ -100,6 +100,8 @@ class Config:
         "KURALLAR:\n"
         "- Kısa, samimi ve Türkçe cevap ver (kullanıcı başka dilde örnek isterse örnek o dilde olabilir); "
         "en fazla 4-5 cümle.\n"
+        "- Kullanıcı kızgın, kaba veya hakaret ediyorsa form hatırlatma ve satış yapma; sakin, kısa ve "
+        "kibar kal, nasıl yardımcı olabileceğini sor.\n"
         "- Kullanıcı satın alma niyeti gösterdiğinde (fiyat, ücretsiz paket, örnek istemek, kayıt, "
         "aranmak) cevabının sonunda 'Size dönüş yapalım' bölümünü bir kez hatırlat.\n"
         "- Paketleri yalnızca kullanıcı fiyat, paket veya üyelik sorduğunda anlat; selamlaşmada "
