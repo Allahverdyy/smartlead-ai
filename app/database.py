@@ -29,13 +29,15 @@ def init_db(app):
             mesaj       TEXT,
             etsy_magaza TEXT,
             eposta      TEXT,
+            kvkk_onay   TEXT,
             tarih       TEXT DEFAULT (datetime('now', 'localtime'))
         )
     """)
     # Eski veritabanında e-posta sütunu yoksa ekle (telefonsuz lead'de telefon '' olarak saklanır)
     sutunlar = [satir[1] for satir in db.execute("PRAGMA table_info(leads)").fetchall()]
-    if 'eposta' not in sutunlar:
-        db.execute("ALTER TABLE leads ADD COLUMN eposta TEXT")
+    for sutun in ('eposta', 'kvkk_onay'):               # sabit adlar, kullanıcı girdisi değil
+        if sutun not in sutunlar:
+            db.execute(f"ALTER TABLE leads ADD COLUMN {sutun} TEXT")
     # Form doldurulmasa da her sohbet kaydedilir (oturum = sayfa açılışında üretilen rastgele kimlik)
     db.execute("""
         CREATE TABLE IF NOT EXISTS sohbetler (
@@ -60,7 +62,8 @@ def lead_ekle(isim, telefon, mesaj, etsy_magaza=None, eposta=None):
     """Yeni lead kaydeder, oluşan kaydın id'sini döndürür."""
     db = get_db()
     imlec = db.execute(
-        "INSERT INTO leads (isim, telefon, mesaj, etsy_magaza, eposta) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO leads (isim, telefon, mesaj, etsy_magaza, eposta, kvkk_onay) "
+        "VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'))",   # onay zamanı: kanıt olarak saklanır
         (isim, telefon or '', mesaj, etsy_magaza, eposta)
     )
     db.commit()

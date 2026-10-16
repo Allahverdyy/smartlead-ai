@@ -12,8 +12,10 @@ AST Digital'in web sitesinde çalışan **akıllı satış asistanı**: Etsy sat
 - ✅ Ortam kurulumu ve duman testi
 - ✅ Mimari tasarım
 - ✅ Backend modülleri (config, database, ai_service, routes, create_app)
-- ✅ 30 otomatik test (`python -m pytest -v`)
-- ⬜ Wix arayüzleri ve Render yayını
+- ✅ 56 otomatik test (`python -m pytest -v`)
+- ✅ Render'da canlı: https://smartlead-ai-dse5.onrender.com (`/health`, `/widget`, `/dashboard`, `/kvkk`)
+- ✅ Wix: tüm sayfalarda asistan popup'ı (giriş ekranı, KVKK onayı, kalıcı sohbet geçmişi, silme)
+- 🟡 Wix Yönetim Paneli (Velo): kod `wix/` klasöründe
 
 ## Yerelde çalıştırma
 
@@ -32,6 +34,8 @@ python -m pytest -v         # testler
 run.py · config.py · requirements.txt · .env.example
 app/  __init__.py · database.py · routes.py · templates/ · services/ai_service.py
 docs/ MIMARI.md · duman-testi.png
+wix/  backend/smartlead.web.js · pages/yonetim-paneli.js   (Wix Velo kodu)
+tests/ test_api.py · test_ai_service.py
 ```
 
 `database.py` dışında SQL, `ai_service.py` dışında yapay zekâ çağrısı yoktur; `routes.py` yalnızca bu iki katmanı çağırır.

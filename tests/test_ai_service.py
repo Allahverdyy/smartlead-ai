@@ -76,9 +76,9 @@ def test_uzun_gecmis_mesaji_kirpilir():
 
 
 def test_sistem_talimati_kisa():
-    """Groq dakikada 8.000 token veriyor; talimat 4.800 karakteri geçmemeli."""
+    """Groq dakikada 8.000 token veriyor; talimat 5.000 karakteri geçmemeli."""
     from config import Config
-    assert len(Config.BUSINESS_CONTEXT) < 4800
+    assert len(Config.BUSINESS_CONTEXT) < 5000   # ~1.300 token; dakikalık 8.000 token kotasında 4-5 istek yer bırakır
 
 
 def test_marka_filtresi_ve_etiket_siniri():

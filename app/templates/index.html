@@ -53,7 +53,7 @@
   .donus.acik .donus-ac .ok { transform:rotate(180deg); }
   #leadForm { display:grid; grid-template-columns:1fr 1fr; gap:8px 10px; padding:0 16px; max-height:0; overflow:hidden;
               transition:max-height .3s ease, padding .3s ease; }
-  .donus.acik #leadForm { max-height:200px; padding:0 16px 14px; }
+  .donus.acik #leadForm { max-height:260px; padding:0 16px 14px; }
   label { font-size:11.5px; font-weight:600; color:#5b5446; display:flex; flex-direction:column; gap:4px; }
   #leadForm button { grid-column:1 / -1; }
 
@@ -110,6 +110,10 @@
   .panel-alt .sil { align-self:center; }
   .bos-liste { text-align:center; color:#7a7262; font-size:13px; padding:30px 0; }
   .gizli { display:none !important; }
+  .onay { display:flex; flex-direction:row; align-items:flex-start; gap:8px; font:400 12px Inter; color:#5b5446; line-height:1.45; text-align:left; cursor:pointer; }
+  .onay input { width:16px; height:16px; margin-top:1px; flex-shrink:0; accent-color:var(--mercan); padding:0; }
+  .onay a { color:var(--navy); font-weight:600; }
+  #leadForm .onay { grid-column:1 / -1; }
 {% if gomulu %}
   /* Wix popup'ı içinde: kenar boşluğu yok, pencere tüm alanı kaplar */
   body { padding:0; background:var(--navy); align-items:stretch; min-height:0; height:100vh; }
@@ -141,12 +145,14 @@
       <form id="girisForm" novalidate>
         <input id="gIsim" placeholder="Ad Soyad" maxlength="100" autocomplete="name">
         <input id="gEposta" type="email" inputmode="email" placeholder="E-posta adresiniz" maxlength="120" autocomplete="email">
+        <label class="onay"><input type="checkbox" id="gKvkk">
+          <span><a href="/kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a>'ni okudum; bilgilerimin bana dönüş yapılması için işlenmesini kabul ediyorum.</span></label>
         <div id="girisHata"></div>
         <button class="ana">Sohbete başla</button>
       </form>
       <button class="bag" id="girisAtla" type="button">Bilgi vermeden devam et</button>
-      <p class="kvkk">Bilgileriniz yalnızca size dönüş yapmak için kullanılır. Sohbetleriniz bu tarayıcıda saklanır;
-        “Sohbetlerim” bölümünden istediğiniz an silebilirsiniz.</p>
+      <p class="kvkk">Sohbetleriniz bu tarayıcıda saklanır; “Sohbetlerim” bölümünden istediğiniz an silebilirsiniz.
+        Lütfen sohbete hassas bilgi (kimlik, kart, sağlık) yazmayın.</p>
     </section>
 
     <!-- 2) Sohbet -->
@@ -162,6 +168,8 @@
           <label>Telefon
             <input id="telefon" type="tel" inputmode="tel" placeholder="05xx xxx xx xx" maxlength="17" autocomplete="tel" required>
           </label>
+          <label class="onay" id="lKvkkSatir"><input type="checkbox" id="lKvkk">
+            <span><a href="/kvkk" target="_blank" rel="noopener">Aydınlatma Metni</a>'ni okudum, onaylıyorum.</span></label>
           <button class="ana">Beni arayın</button>
         </form>
       </div>
@@ -280,6 +288,7 @@
     mesajEkle(o.acilis, 'bot');
     for (const m of o.gecmis) mesajEkle(m.content, m.role === 'user' ? 'kullanici' : 'bot');
     if (durum.profil && durum.profil.isim) $('isim').value = durum.profil.isim;
+    $('lKvkkSatir').classList.toggle('gizli', !!(durum.profil && durum.profil.kvkk));   // girişte onayladıysa tekrar sorma
   }
 
   function ekran(ad) {
@@ -303,17 +312,18 @@
     const hata = $('girisHata'); hata.textContent = '';
     if (!ISIM_DESENI.test(isim)) { hata.textContent = 'Lütfen adınızı yazın (yalnızca harf).'; return; }
     if (!EPOSTA_DESENI.test(eposta)) { hata.textContent = 'Lütfen geçerli bir e-posta yazın.'; return; }
+    if (!$('gKvkk').checked) { hata.textContent = 'Devam etmek için Aydınlatma Metni onayını işaretleyin.'; return; }
     const buton = e.target.querySelector('button'); buton.disabled = true;
     if (!aktif()) yeniOturum();
     try {
       const yanit = await fetch('/api/leads', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ isim, eposta, mesaj: '', oturum: durum.aktif })
+        body: JSON.stringify({ isim, eposta, mesaj: '', oturum: durum.aktif, kvkk_onay: true })
       });
       const veri = await yanit.json();
       if (!veri.basari && yanit.status !== 429) { hata.textContent = veri.hata; buton.disabled = false; return; }
     } catch { /* sunucuya ulaşılamasa da sohbet açılsın; bilgi sohbet kaydına yine eklenir */ }
-    durum.profil = { isim, eposta }; kaydet();
+    durum.profil = { isim, eposta, kvkk: true }; kaydet();
     buton.disabled = false;
     baslat();
   });
@@ -343,7 +353,7 @@
         fetch('/api/sohbet', {
           method: 'POST', headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ mesaj, gecmis: durum.oturumlar[oturumId].gecmis, oturum: oturumId,
-                                 isim: p.isim || '', eposta: p.eposta || '' })
+                                 isim: p.isim || '', eposta: p.eposta || '', kvkk_onay: !!p.kvkk })
         }),
         bekle(enAzSure)
       ]);
@@ -392,15 +402,20 @@
     const isim = $('isim').value.trim();
     const telefon = $('telefon').value.trim();
     // Sohbetin tamamı, kimin yazdığıyla birlikte (panelde okunabilsin diye)
+    const onayli = !!(durum.profil && durum.profil.kvkk) || $('lKvkk').checked;
+    if (!onayli) { bilgiEkle('Devam etmek için Aydınlatma Metni onayını işaretleyin.', 'hata'); return; }
     const sohbetDokumu = gecmis().map(m => (m.role === 'user' ? 'Ziyaretçi: ' : 'Asistan: ') + m.content).join('\n');
     buton.disabled = true;
     try {
       const yanit = await fetch('/api/leads', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ isim, telefon, eposta: (durum.profil || {}).eposta || '', mesaj: sohbetDokumu, oturum: durum.aktif })
+        body: JSON.stringify({ isim, telefon, eposta: (durum.profil || {}).eposta || '', mesaj: sohbetDokumu, oturum: durum.aktif, kvkk_onay: true })
       });
       const veri = await yanit.json();
       if (veri.basari) {
+        durum.profil = Object.assign(durum.profil || {}, { kvkk: true, isim: durum.profil && durum.profil.isim || isim });
+        delete durum.profil.atla; kaydet();
+        $('lKvkkSatir').classList.add('gizli');
         bilgiEkle('✓ ' + veri.mesaj, 'basarili');
         $('telefon').value = '';
         donus.classList.remove('acik');

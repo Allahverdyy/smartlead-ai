@@ -149,6 +149,17 @@ Tek tablo: **`leads`** — yönergedeki zorunlu şema + AST Digital'e özel **te
 
 Yönergenin izin verdiği kişiselleştirme ("restoran için `kisi_sayisi`, emlak için `butce`") AST Digital'de `etsy_magaza` olarak uygulanır; fonksiyonlar ve form bu sütuna göre güncellenir.
 
+**16 Ekim eklemeleri** (canlı testte görülen ihtiyaçlardan):
+
+| Tablo · Alan | Neden |
+|---|---|
+| `leads.mesaj` | Artık ziyaretçinin tüm sohbeti (`Ziyaretçi: … / Asistan: …` satırları, son 12.000 karakter) |
+| `leads.eposta` | Giriş ekranında ad + e-posta alınır; telefon zorunlu değil (telefonsuz kayıtta `''`) |
+| `leads.kvkk_onay` | KVKK onayının verildiği zaman (kanıt) |
+| **`sohbetler`** tablosu: `oturum` (PK), `dokum`, `mesaj_sayisi`, `lead_id`, `z_isim`, `z_eposta`, `ilk_tarih`, `son_tarih` | Form doldurulmasa da her sohbet kaydedilir (analiz için). `oturum` = tarayıcıda üretilen rastgele kimlik; lead'e dönüşürse `lead_id` ile bağlanır |
+
+Eski veritabanı dosyaları açılışta otomatik güncellenir (`PRAGMA table_info` + `ALTER TABLE ADD COLUMN`).
+
 ---
 
 ## 6. Modüllerin Fonksiyonları (Yönerge Modül A–E)
@@ -207,7 +218,8 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 
 ## Modül F — Testler
 
-- `python -m pytest -v` → **30 test**, Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
+- **16 Ekim güncel: 56 test.** Yeni testler: sohbet kaydı ve oturum, sohbete yazılan telefonla otomatik lead, e-posta ile telefonsuz lead, aynı oturumda tek lead, ziyaretçinin sohbetini silmesi, KVKK onayı (onaysız lead 400, onaysız sohbetteki telefon kaydedilmez), sahte form satırı temizliği, önbellek başlığı.
+- `python -m pytest -v` → **30 test** (11 Ekim), Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
 - `tests/test_api.py` (16): `/health`, sayfalar, `/api/sohbet` (400 / 200 demo / 503), `/api/leads` (201, telefon standardı, geçersiz isim/telefon/mağaza → 400, SQL enjeksiyonu, sıralama), `ADMIN_KEY` (401/200), CORS (Wix izinli, başka site engelli).
 - `tests/test_ai_service.py` (6): demo modu, mesaj sırası ve 10 mesaj sınırı, sahte `system` mesajının sızmaması, Markdown temizliği, ikinci örneği durduran kod kapısı.
 - **Testin yakaladığı hata:** Markdown temizliği Groq isteği fonksiyonunun içindeydi; tüm cevapların geçtiği `yanit_uret()`'e taşındı.
@@ -236,7 +248,8 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 - [ ] İlk tadımlık örnekte etiket sayısı (en fazla 5) ve açıklama yazmama kuralı da kodla garanti altına alınmalı (şu an yalnızca talimat).
 - [x] Ret mesajları her seferinde farklı cümleyle kurulacak (16 Ekim, talimata eklendi).
 - [ ] Etiket kalitesi: bitişik yazım, ürünle ilgisiz kelimeler (ör. "military shirt") — gözlemlenecek.
-- [ ] Sohbette isim/telefon yazan kullanıcı: bot formu gösteriyor ama bilgiyi kaydetmiyor; kaçan lead olabilir.
+- [x] Sohbette isim/telefon yazan kullanıcı (16 Ekim): KVKK onayı verdiyse telefon koddan yakalanıp lead'e eklenir, bot "kayıt yapamıyorum" yerine teşekkür eder. Bot sohbete sahte form ("Adınız: / Telefon:") yazarsa kod bu satırları siler.
+- [x] Bot verilen bilgiyi tekrar soruyordu (16 Ekim): geçmiş artık rol bazlı kırpılıyor (kullanıcı 500, bot 220 karakter, son 12 mesaj); "verilen bilgiyi tekrar sorma", en fazla 3–4 cümle kuralı.
 - [x] Hitap "siz" olarak sabitlendi (16 Ekim).
 - [ ] `gpt-oss-120b` ile karşılaştırma testi: kurala uyum / hız / kota.
 - [x] **Groq istek sınırı (16 Ekim):** Ücretsiz plan dakikada 8.000 / günde 200.000 token. Sistem talimatı 6.440 → 2.738 karaktere indirildi (kurallar korunarak), geçmiş son 8 mesaj ve mesaj başına 600 karakterle sınırlandı, cevap 600 token. IP başına sınır: sohbet dakikada 6, lead 10 dakikada 3 istek (aşılırsa 429 + Türkçe mesaj). 8 yeni test → toplam 30 test.
@@ -256,6 +269,14 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 | POST `/api/leads` | Yeni lead kaydeder | `database.lead_ekle()` | `{"isim", "telefon", "mesaj", "etsy_magaza"}` | 201 `{"basari": true}` |
 | GET `/api/leads` | Tüm lead'leri getirir | `database.tum_leadler()` | — | `{"basari": true, "leadler": [...]}` |
 | GET `/health` | Canlılık kontrolü | — | — | `{"durum": "aktif"}` |
+| GET `/widget` | Wix popup'ına gömülen sohbet penceresi | `render_template` | — | `index.html` (tam ekran) |
+| GET `/kvkk` | KVKK Aydınlatma Metni | `render_template` | — | `kvkk.html` |
+| GET `/api/sohbetler` | Tüm sohbetler (yönetici) | `database.tum_sohbetler()` | `X-Admin-Key` | `{"basari": true, "sohbetler": [...]}` |
+| DELETE `/api/sohbet/<oturum>` | Ziyaretçi kendi sohbetini siler | `database.sohbeti_sil()` | — | `{"basari": true}` |
+
+`POST /api/sohbet` ek alanları: `oturum`, `isim`, `eposta`, `kvkk_onay` → cevapta `kaydedildi` (sohbete yazılan telefon lead olduysa `true`).
+`POST /api/leads` ek alanları: `eposta`, `oturum`, **`kvkk_onay: true` zorunlu** (yoksa 400). Telefon veya e-posta'dan biri yeterli.
+HTML ve JSON cevapları `Cache-Control: no-store` ile döner (push sonrası eski sürüm görünmesin).
 
 **Hata formatı (tüm API uç noktalarında aynı):**
 
@@ -263,7 +284,7 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 { "basari": false, "hata": "Kullanıcıya gösterilebilecek kısa açıklama" }
 ```
 
-**Alan adları sözleşmesi (Yönerge Modül G — "Aynı Kelimeler"):** sohbet için `mesaj` / `cevap`, kayıt için `isim` / `telefon` / `mesaj` / `etsy_magaza`, liste için `leadler`. Wix tarafı bu adları birebir kullanır.
+**Alan adları sözleşmesi (Yönerge Modül G — "Aynı Kelimeler"):** sohbet için `mesaj` / `cevap` / `oturum`, kayıt için `isim` / `telefon` / `eposta` / `mesaj` / `etsy_magaza` / `kvkk_onay`, liste için `leadler` ve `sohbetler`. Wix tarafı bu adları birebir kullanır.
 
 ---
 
@@ -319,12 +340,19 @@ Kurallar:
 
 ## 11. Wix Bağlantısı (Yönerge Modül G)
 
-| Arayüz | UX deseni | Bileşenler (hepsine ID verilir) | Backend |
-|---|---|---|---|
-| **Karşılama Sayfası (B2C)** | **Z-Pattern:** logo sol üst, sohbet sağ, form alt bölge. Sohbet kartında **Glassmorphism** (buzlu cam) | Mesaj girişi, "Sor" butonu, yanıt alanı; isim, telefon, Etsy mağazası girişleri, KVKK onayı, "Kaydet" butonu | `wix-fetch` → `POST /api/sohbet`, `POST /api/leads` |
-| **Yönetim Paneli (B2B)** | **F-Pattern:** en önemli kolon (isim) solda | Repeater (isim · telefon · Etsy mağazası · tarih) | `wix-fetch` → `GET /api/leads`; her objeye `_id` eklenir, satırda `$item` kullanılır |
+| Arayüz | Uygulama | Backend |
+|---|---|---|
+| **Karşılama (B2C) — tüm sayfalarda asistan** | Sabit üst bantta `#btnAsistan` → Wix **Popup** → içine Render'daki `/widget` gömülü (Embed a Site, 380×560) | Widget doğrudan `POST /api/sohbet`, `POST /api/leads`, `DELETE /api/sohbet/<oturum>` |
+| **Yönetim Paneli (B2B)** | Gizli "Yönetim" sayfası · **F-Pattern** · KPI kartları + arama + sekmeler + `#repeaterLeads` (her öğe `_id`, `$item`) | Velo backend web modülü (`wix/backend/smartlead.web.js`) → `wix-fetch` → `GET /api/leads`, `GET /api/sohbetler` |
 
-Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel Input bileşenleridir.
+**Yönergeden bilinçli sapma (sohbet):** Sohbet Wix Input'larıyla değil gömülü pencereyle yapıldı. Sebepleri:
+1. **Tüm sayfalarda çalışır:** Wix'te global sabit öğe yok; popup her sayfadan aynı pencereyi açar.
+2. **IP sınırı çalışır:** İstek ziyaretçinin tarayıcısından gelir. `wix-fetch` backend'den gitseydi tüm ziyaretçiler Wix'in IP'sinden geliyormuş gibi görünür, istek sınırı anlamsızlaşırdı.
+3. **Daha zengin deneyim:** "yazıyor…" animasyonu, giriş ekranı, kalıcı sohbet geçmişi ("Sohbetlerim"), sohbet silme — Wix bileşenleriyle kodla oluşturulamaz.
+
+**Yönetim Paneli Wix'te ve Velo ile:** Anahtar (`ADMIN_KEY`) **Wix Secrets Manager**'da (`SMARTLEAD_ADMIN_KEY`) durur, tarayıcıya hiç inmez. Web modülü `Permissions.Admin` ile korunur: yalnızca site yöneticisi veri alabilir. Render uykudaysa sayfa sunucuyu uyandırıp 15 sn arayla 4 kez dener. Sohbet metni `$item('#txtSohbet').html` ile basılır; kullanıcı metni önce HTML'den kaçırılır (XSS). Yedek panel: `https://smartlead-ai-dse5.onrender.com/dashboard`.
+
+**Ziyaretçi akışı:** Giriş ekranı (ad soyad + e-posta + **KVKK onay kutusu**, isteğe bağlı "Bilgi vermeden devam et") → sohbet → sohbet tarayıcıda saklanır, site kapansa da devam eder → "Sohbetlerim"den eski sohbetler açılır veya silinir (sunucudan da silinir; bırakılan iletişim bilgisi kalır).
 
 ---
 
@@ -352,9 +380,11 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
 | Rotalar · Fabrika + giriş | Modül D–E | ✅ 11 Ekim |
-| Çalıştırma + test | Modül F | ✅ 16 Ekim — `pytest`: 30 otomatik test |
+| Çalıştırma + test | Modül F | ✅ 16 Ekim — `pytest`: 56 otomatik test |
 | Chatbot ince ayarı | — | ⚠️ Açık maddeler var (yukarıda) |
-| Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
+| Wix Karşılama (asistan popup, tüm sayfalar) | Modül G | ✅ 16 Ekim |
+| Wix Yönetim Paneli (Velo + Repeater) | Modül G | 🟡 16 Ekim — kod hazır (`wix/`), Wix'e kurulum |
+| KVKK onayı + Aydınlatma Metni (`/kvkk`) | Modül G | ✅ 16 Ekim |
 | Render'da canlı yayın | Modül H (3–5) | ✅ 11 Ekim — https://smartlead-ai-dse5.onrender.com |
 | README son hali, sunum/demo | Teslim | ⬜ 27 Ekim jüri |
 

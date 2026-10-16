@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KVKK Aydınlatma Metni · AST Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0F1B33; --mercan:#FF6B4A; --krem:#F2E9DA; --kum:#FAF7F2; --gri:#4A5468; --cizgi:#E4D8C4; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Inter, sans-serif; background:var(--kum); color:var(--navy); line-height:1.65; }
+  header { background:var(--navy); color:var(--krem); padding:22px 20px; border-bottom:3px solid var(--mercan); }
+  header div { max-width:760px; margin:0 auto; display:flex; align-items:center; gap:14px; }
+  header img { width:36px; }
+  header h1 { font:700 19px Sora, sans-serif; }
+  header small { display:block; font:400 12px Inter; opacity:.7; }
+  main { max-width:760px; margin:0 auto; padding:28px 20px 60px; }
+  h2 { font:600 16px Sora, sans-serif; margin:26px 0 8px; }
+  p, li { font-size:14.5px; color:#2a3348; }
+  ul { padding-left:20px; display:grid; gap:4px; }
+  .kutu { background:#fff; border:1px solid var(--cizgi); border-radius:14px; padding:14px 16px; margin-top:10px; }
+  .not { background:#fff1ec; border-color:#f6cdbf; }
+  a { color:var(--navy); }
+  footer { font-size:12.5px; color:var(--gri); margin-top:30px; }
+</style>
+</head>
+<body>
+<header><div>
+  <img src="{{ url_for('static', filename='ast-sembol.svg') }}" alt="AST Digital">
+  <h1>KVKK Aydınlatma Metni<small>AST Digital · SmartLead AI asistanı</small></h1>
+</div></header>
+<main>
+  <p>6698 sayılı Kişisel Verilerin Korunması Kanunu'nun (KVKK) 10. maddesi uyarınca, sitemizdeki yapay zekâ asistanını
+     kullanırken işlenen kişisel verileriniz hakkında sizi bilgilendiririz.</p>
+
+  <h2>1. Veri sorumlusu</h2>
+  <p>AST Digital — Abdulsamed Tanrıverdi. İletişim: <a href="mailto:digital.ast.tr@gmail.com">digital.ast.tr@gmail.com</a></p>
+
+  <h2>2. İşlenen veriler</h2>
+  <ul>
+    <li>Kimlik ve iletişim: ad soyad, e-posta adresi, (verirseniz) telefon numarası ve Etsy mağaza adı</li>
+    <li>Sohbet içeriği: asistana yazdığınız mesajlar ve asistanın cevapları</li>
+    <li>İşlem güvenliği: kötüye kullanımı önlemek için geçici olarak tutulan IP adresi (kalıcı kaydedilmez)</li>
+  </ul>
+
+  <h2>3. İşleme amaçları</h2>
+  <ul>
+    <li>Sorularınıza asistan aracılığıyla cevap vermek</li>
+    <li>Talep etmeniz halinde sizinle iletişime geçmek ve hizmetlerimiz hakkında bilgi vermek</li>
+    <li>Hizmet kalitesini ölçmek ve asistanın cevaplarını iyileştirmek</li>
+  </ul>
+
+  <h2>4. Toplama yöntemi ve hukuki sebep</h2>
+  <p>Veriler, asistan penceresine sizin yazmanızla elektronik ortamda toplanır. İletişim bilgileriniz açık rızanıza
+     (KVKK m.5/1), sohbet içeriği ise talep ettiğiniz hizmetin sunulması (KVKK m.5/2-c) hukuki sebebine dayanarak işlenir.</p>
+
+  <h2>5. Aktarım</h2>
+  <p>Mesajlarınız, cevap üretilebilmesi için yapay zekâ hizmet sağlayıcımıza (Groq) ve sistemin barındırıldığı sunucu
+     hizmetine (Render) iletilir. Bu hizmet sağlayıcılar yurt dışında bulunduğundan aktarım açık rızanıza dayanır
+     (KVKK m.9). Verileriniz bunun dışında üçüncü kişilerle paylaşılmaz ve satılmaz.</p>
+  <div class="kutu not">Lütfen sohbete sağlık bilgisi, kimlik numarası, kart bilgisi gibi özel nitelikli veya hassas
+     bilgiler yazmayın.</div>
+
+  <h2>6. Saklama ve silme</h2>
+  <p>Sohbetleriniz kendi tarayıcınızda da saklanır; asistandaki “Sohbetlerim” bölümünden istediğiniz an silebilirsiniz.
+     Sildiğiniz sohbet sunucumuzdan da silinir. İletişim bilgileriniz, işleme amacı sona erdiğinde veya talebiniz
+     üzerine silinir.</p>
+
+  <h2>7. Haklarınız (KVKK m.11)</h2>
+  <p>Verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini veya silinmesini isteme, aktarıldığı
+     kişileri bilme, itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz. Başvurularınızı
+     <a href="mailto:digital.ast.tr@gmail.com">digital.ast.tr@gmail.com</a> adresine iletebilirsiniz; en geç 30 gün içinde
+     yanıtlanır.</p>
+
+  <footer>Son güncelleme: 16 Ekim 2026</footer>
+</main>
+</body>
+</html>

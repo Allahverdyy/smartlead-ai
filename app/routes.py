@@ -40,6 +40,12 @@ def widget():
     return render_template('index.html', gomulu=True)
 
 
+@sayfalar.route('/kvkk')
+def kvkk():
+    """KVKK Aydınlatma Metni (giriş ekranındaki onay kutusundan bağlanır)."""
+    return render_template('kvkk.html')
+
+
 @sayfalar.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
@@ -145,7 +151,9 @@ def sohbet():
     eposta = str(veri.get('eposta') or '').strip().lower()
     eposta = eposta if len(eposta) <= 120 and EPOSTA_DESENI.match(eposta) else None
 
-    iletisim = _sohbetteki_iletisim(mesaj) if oturum else None   # kaydedemeyeceksek 'aldım' dedirtmeyiz
+    kvkk_onay = veri.get('kvkk_onay') is True
+    # Sohbete yazılan telefon yalnızca KVKK onayı verildiyse kaydedilir; kaydedemeyeceksek 'aldım' dedirtmeyiz
+    iletisim = _sohbetteki_iletisim(mesaj) if (oturum and kvkk_onay) else None
     try:
         cevap = ai_service.yanit_uret(mesaj, gecmis, iletisim_alindi=bool(iletisim), isim=isim)
     except AIServiceError as e:
@@ -186,6 +194,8 @@ def lead_kaydet():
     oturum = str(veri.get('oturum') or '')
     isim = re.sub(r'\s+', ' ', isim)            # fazla boşlukları tek boşluğa indir
 
+    if veri.get('kvkk_onay') is not True:
+        return _hata('Devam etmek için KVKK Aydınlatma Metni onayı gereklidir.', 400)
     if not isim or not (telefon or eposta):
         return _hata('İsim ve telefon (veya e-posta) zorunludur.', 400)
     if not ISIM_DESENI.match(isim):
