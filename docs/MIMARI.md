@@ -207,7 +207,7 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 
 ## Modül F — Testler
 
-- `python -m pytest -v` → **24 test**, Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
+- `python -m pytest -v` → **30 test**, Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
 - `tests/test_api.py` (16): `/health`, sayfalar, `/api/sohbet` (400 / 200 demo / 503), `/api/leads` (201, telefon standardı, geçersiz isim/telefon/mağaza → 400, SQL enjeksiyonu, sıralama), `ADMIN_KEY` (401/200), CORS (Wix izinli, başka site engelli).
 - `tests/test_ai_service.py` (6): demo modu, mesaj sırası ve 10 mesaj sınırı, sahte `system` mesajının sızmaması, Markdown temizliği, ikinci örneği durduran kod kapısı.
 - **Testin yakaladığı hata:** Markdown temizliği Groq isteği fonksiyonunun içindeydi; tüm cevapların geçtiği `yanit_uret()`'e taşındı.
@@ -234,15 +234,15 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 
 **Açık kalanlar:**
 - [ ] İlk tadımlık örnekte etiket sayısı (en fazla 5) ve açıklama yazmama kuralı da kodla garanti altına alınmalı (şu an yalnızca talimat).
-- [ ] Ret mesajları tekrar edince robotik duruyor (aynı cümle art arda) — varyasyon gerekiyor.
+- [x] Ret mesajları her seferinde farklı cümleyle kurulacak (16 Ekim, talimata eklendi).
 - [ ] Etiket kalitesi: bitişik yazım, ürünle ilgisiz kelimeler (ör. "military shirt") — gözlemlenecek.
 - [ ] Sohbette isim/telefon yazan kullanıcı: bot formu gösteriyor ama bilgiyi kaydetmiyor; kaçan lead olabilir.
-- [ ] Hitap tutarlılığı (sen/siz karışıyor) — "siz" sabitlenecek.
+- [x] Hitap "siz" olarak sabitlendi (16 Ekim).
 - [ ] `gpt-oss-120b` ile karşılaştırma testi: kurala uyum / hız / kota.
-- [ ] **Groq istek sınırı (yüksek öncelik):** sistem talimatı uzun → dakikalık token sınırı hızla doluyor. Talimat kısaltılmalı + IP başına istek sınırı (ör. dakikada 5 mesaj) eklenmeli. Jüride birkaç kişi aynı anda denerse bot susabilir.
-- [ ] **Lead'lerin kalıcılığı (yüksek öncelik):** Render Free'de SQLite siliniyor. Seçenekler: Modül G'de lead'i Wix CMS'e de yazmak / harici ücretsiz veritabanı. Jüri sorusuna cevap hazır olmalı.
+- [x] **Groq istek sınırı (16 Ekim):** Ücretsiz plan dakikada 8.000 / günde 200.000 token. Sistem talimatı 6.440 → 2.738 karaktere indirildi (kurallar korunarak), geçmiş son 8 mesaj ve mesaj başına 600 karakterle sınırlandı, cevap 600 token. IP başına sınır: sohbet dakikada 6, lead 10 dakikada 3 istek (aşılırsa 429 + Türkçe mesaj). 8 yeni test → toplam 30 test.
+- [x] **Lead'lerin kalıcılığı — karar (16 Ekim):** Yönergeye ve ders notlarına sadık kalınarak SQLite korunuyor (ders notlarında CMS'e yazma istenmiyor). Render Free'de dosya sistemi kalıcı olmadığı için sunucu uyuyunca kayıtlar sıfırlanır; bu bilinen bir kısıttır. Jüri planı: sunumdan önce sunucu uyandırılır, canlı demoda lead girilip panelde gösterilir. Üretim için çözüm: kalıcı disk veya harici veritabanı (Postgres) — `database.py` tek dosya olduğu için geçiş yalnızca bu katmanı etkiler.
 - [ ] **Soğuk başlangıç:** sunumdan 2 dk önce `/health` açılıp sunucu uyandırılacak (ya da 10 dk'da bir ping atan izleme servisi).
-- [ ] 404 sayfası Flask'ın İngilizce varsayılanı — JSON/Türkçe hata sayfası.
+- [x] 404 / 405 / 500 artık Türkçe JSON döner (16 Ekim).
 
 ---
 
@@ -352,7 +352,7 @@ Ders kuralları gereği Wix "Form" öğesi kullanılmaz; tüm girişler manuel I
 | Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
 | Rotalar · Fabrika + giriş | Modül D–E | ✅ 11 Ekim |
-| Çalıştırma + test | Modül F | ✅ 11 Ekim — `pytest`: 24 otomatik test |
+| Çalıştırma + test | Modül F | ✅ 16 Ekim — `pytest`: 30 otomatik test |
 | Chatbot ince ayarı | — | ⚠️ Açık maddeler var (yukarıda) |
 | Wix Karşılama Sayfası + Yönetim Paneli | Modül G | ⬜ Belgrad |
 | Render'da canlı yayın | Modül H (3–5) | ✅ 11 Ekim — https://smartlead-ai-dse5.onrender.com |

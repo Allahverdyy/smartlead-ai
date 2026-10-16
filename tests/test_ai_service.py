@@ -12,7 +12,7 @@ def test_mesaj_sirasi_ve_gecmis_siniri():
     mesajlar = servis._mesajlari_hazirla('yeni', gecmis)
     assert mesajlar[0]['role'] == 'system'                 # önce sistem talimatı
     assert mesajlar[-1] == {'role': 'user', 'content': 'yeni'}   # en sonda yeni mesaj
-    assert len(mesajlar) == 1 + 10 + 1                      # geçmişten yalnızca son 10
+    assert len(mesajlar) == 1 + 8 + 1                       # geçmişten yalnızca son 8
 
 
 def test_gecersiz_gecmis_kayitlari_atlanir():
@@ -65,3 +65,37 @@ def test_429_devam_ederse_anlasilir_hata(monkeypatch):
         assert False, 'hata bekleniyordu'
     except AIServiceError as e:
         assert 'yoğunluk' in str(e) and '429' not in str(e)     # kullanıcı teknik kod görmez
+
+
+def test_uzun_gecmis_mesaji_kirpilir():
+    servis = AIService(api_key='x')
+    mesajlar = servis._mesajlari_hazirla('yeni', [{'role': 'user', 'content': 'a' * 5000}])
+    assert len(mesajlar[1]['content']) == 600
+
+
+def test_sistem_talimati_kisa():
+    """Groq dakikada 8.000 token veriyor; talimat 4.800 karakteri geçmemeli."""
+    from config import Config
+    assert len(Config.BUSINESS_CONTEXT) < 4800
+
+
+def test_marka_filtresi_ve_etiket_siniri():
+    servis = AIService(api_key='x')
+    servis._groq_istegi = lambda m: ('Başlık: Argentina Soccer T-Shirt – Official Argentina National Team Fan Shirt – Soccer Fan Gift\n'
+                                     'Etiketler: Argentina, Soccer, FIFA World Cup, Football, T-Shirt, Fan, Gift, NationalTeam')
+    cevap = servis.yanit_uret('ornek')
+    assert 'official' not in cevap.lower() and 'national team' not in cevap.lower() and 'fifa' not in cevap.lower()
+    etiketler = cevap.split('Etiketler:')[1].split(',')
+    assert len(etiketler) == 5
+
+
+def test_hafiza_yalani_duzeltilir():
+    servis = AIService(api_key='x')
+    servis._groq_istegi = lambda m: 'Merhaba Ahmet, sizi hatırlıyorum. Ne satıyorsunuz?'
+    assert 'hatırlayamıyorum' in servis.yanit_uret('beni hatırladın mı?', [])
+
+
+def test_hatirlamiyorum_dokunulmaz():
+    servis = AIService(api_key='x')
+    servis._groq_istegi = lambda m: 'Sizi hatırlamıyorum ama yardımcı olurum.'
+    assert servis.yanit_uret('beni hatırladın mı?', []) == 'Sizi hatırlamıyorum ama yardımcı olurum.'

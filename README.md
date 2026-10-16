@@ -12,7 +12,7 @@ AST Digital'in web sitesinde çalışan **akıllı satış asistanı**: Etsy sat
 - ✅ Ortam kurulumu ve duman testi
 - ✅ Mimari tasarım
 - ✅ Backend modülleri (config, database, ai_service, routes, create_app)
-- ✅ 22 otomatik test (`python -m pytest -v`)
+- ✅ 30 otomatik test (`python -m pytest -v`)
 - ⬜ Wix arayüzleri ve Render yayını
 
 ## Yerelde çalıştırma

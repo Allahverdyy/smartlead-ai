@@ -1,5 +1,7 @@
 import re
 import sqlite3
+import time
+from collections import defaultdict, deque
 
 from flask import Blueprint, current_app, jsonify, render_template, request
 
@@ -45,10 +47,34 @@ def _yonetici_mi():
     return request.headers.get('X-Admin-Key') == anahtar
 
 
+# IP başına istek sınırı (bellekte; tek sunucu için yeterli)
+_istekler = defaultdict(deque)
+SINIRLAR = {'sohbet': (6, 60), 'lead': (3, 600)}   # (en fazla istek, saniye)
+
+
+def _istemci_ip():
+    """Render bir vekil sunucunun arkasında çalışır; gerçek IP X-Forwarded-For'un ilk değeridir."""
+    return (request.headers.get('X-Forwarded-For', request.remote_addr or '') .split(',')[0].strip())
+
+
+def _sinir_asildi_mi(tur):
+    adet, sure = SINIRLAR[tur]
+    simdi = time.time()
+    kuyruk = _istekler[(tur, _istemci_ip())]
+    while kuyruk and simdi - kuyruk[0] > sure:
+        kuyruk.popleft()
+    if len(kuyruk) >= adet:
+        return True
+    kuyruk.append(simdi)
+    return False
+
+
 # ---------------- API ----------------
 
 @api.route('/sohbet', methods=['POST'])
 def sohbet():
+    if _sinir_asildi_mi('sohbet'):
+        return _hata('Çok hızlı mesaj gönderiyorsunuz, lütfen bir dakika sonra tekrar deneyin.', 429)
     veri = request.get_json(silent=True) or {}
     mesaj = str(veri.get('mesaj') or '').strip()
     gecmis = veri.get('gecmis') or []
@@ -70,6 +96,8 @@ def sohbet():
 
 @api.route('/leads', methods=['POST'])
 def lead_kaydet():
+    if _sinir_asildi_mi('lead'):
+        return _hata('Bilgileriniz zaten alındı; birkaç dakika sonra tekrar deneyebilirsiniz.', 429)
     veri = request.get_json(silent=True) or {}
     isim = str(veri.get('isim') or '').strip()
     telefon = str(veri.get('telefon') or '').strip()

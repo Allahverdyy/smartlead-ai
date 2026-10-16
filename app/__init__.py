@@ -26,6 +26,19 @@ def create_app(ortam='default', **ek_ayarlar):
     app.register_blueprint(sayfalar)
     app.register_blueprint(api)
 
+    # Hata sayfaları da JSON ve Türkçe olsun (Wix tarafı her zaman aynı biçimi okur)
+    @app.errorhandler(404)
+    def bulunamadi(e):
+        return jsonify(basari=False, hata='İstenen adres bulunamadı.'), 404
+
+    @app.errorhandler(405)
+    def yontem_yok(e):
+        return jsonify(basari=False, hata='Bu adres bu istek türünü desteklemiyor.'), 405
+
+    @app.errorhandler(500)
+    def sunucu_hatasi(e):
+        return jsonify(basari=False, hata='Beklenmeyen bir hata oluştu.'), 500
+
     # Render ve izleme araçları için sağlık kontrolü
     @app.route('/health')
     def health():

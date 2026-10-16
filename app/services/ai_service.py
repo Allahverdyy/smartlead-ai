@@ -1,3 +1,4 @@
+import re
 import time
 
 import requests
@@ -5,6 +6,16 @@ from config import Config
 
 GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 MODEL = Config.GROQ_MODEL
+
+# Groq ücretsiz plan: dakikada 8.000 token. Her istekte giden metni sınırlı tutuyoruz.
+GECMIS_SINIRI = 8              # geçmişten en fazla 8 mesaj
+MESAJ_KARAKTER_SINIRI = 600    # geçmişteki her mesajdan en fazla 600 karakter
+CEVAP_TOKEN_SINIRI = 600
+
+# Marka/telif riski taşıyan ifadeler: öneride asla kullanıcıya gitmez (listing aracındaki enforce_brand mantığı)
+YASAKLI_IFADELER = ['official', 'licensed', 'authentic', 'fifa', 'world cup', 'worldcup', 'olympic', 'national team',
+                    'nationalteam', 'disney', 'marvel', 'nike', 'adidas', 'nba', 'nfl', 'uefa', 'premier league']
+ORNEK_ETIKET_SINIRI = 5
 
 
 class AIServiceError(Exception):
@@ -25,9 +36,10 @@ class AIService:
     def _mesajlari_hazirla(self, mesaj, gecmis):
         """Sıra: sistem talimatı -> geçmiş konuşma -> yeni kullanıcı mesajı."""
         mesajlar = [{'role': 'system', 'content': self._sistem_talimati()}]
-        for kayit in (gecmis or [])[-10:]:          # son 10 mesaj yeterli, maliyeti düşürür
+        for kayit in (gecmis or [])[-GECMIS_SINIRI:]:      # son mesajlar yeterli, token kotasını korur
             if kayit.get('role') in ('user', 'assistant') and kayit.get('content'):
-                mesajlar.append({'role': kayit['role'], 'content': kayit['content']})
+                icerik = str(kayit['content'])[:MESAJ_KARAKTER_SINIRI]
+                mesajlar.append({'role': kayit['role'], 'content': icerik})
         if self._ornek_verildi_mi(gecmis):
             mesajlar.append({'role': 'system', 'content': (
                 'Bu sohbette tadımlık başlık/etiket örneği zaten verildi. Yeni başlık, etiket veya '
@@ -55,7 +67,7 @@ class AIService:
                 headers={'Authorization': f'Bearer {self.api_key}',
                          'Content-Type': 'application/json'},
                 json={'model': MODEL, 'messages': mesajlar,
-                      'temperature': 0.6, 'max_tokens': 800,
+                      'temperature': 0.6, 'max_tokens': CEVAP_TOKEN_SINIRI,
                       'reasoning_effort': 'low'},
                 timeout=15
             )
@@ -80,12 +92,46 @@ class AIService:
         """Wix metin kutusu Markdown göstermez; model talimata uymasa bile yıldızları siler."""
         return metin.replace('**', '').replace('__', '').strip()
 
+    @staticmethod
+    def _yasakli_mi(parca):
+        p = parca.lower()
+        return any(ifade in p for ifade in YASAKLI_IFADELER)
+
+    def _ornegi_duzelt(self, metin):
+        """Başlık/etiket örneğinde marka riskli ifadeleri siler, etiketleri 5 ile sınırlar."""
+        satirlar = []
+        for satir in metin.split('\n'):
+            etiket = re.match(r'^(\s*(?:etiketler|etiket|tags)\s*:\s*)(.*)$', satir, re.I)
+            baslik = re.match(r'^(\s*(?:başlık|baslik|title)\s*:\s*)(.*)$', satir, re.I)
+            if etiket:
+                parcalar = [e.strip() for e in etiket.group(2).split(',') if e.strip()]
+                temiz = [e for e in parcalar if not self._yasakli_mi(e)][:ORNEK_ETIKET_SINIRI]
+                satir = etiket.group(1) + ', '.join(temiz)
+            elif baslik:
+                ayrac = ' – ' if '–' in baslik.group(2) or ' - ' in baslik.group(2) else ', '
+                parcalar = [p.strip() for p in re.split(r'\s[–|\-]\s|,\s', baslik.group(2)) if p.strip()]
+                satir = baslik.group(1) + ayrac.join(p for p in parcalar if not self._yasakli_mi(p))
+            satirlar.append(satir)
+        return '\n'.join(satirlar)
+
+    @staticmethod
+    def _hafiza_yalani_mi(cevap, gecmis):
+        """Sohbet geçmişi yokken 'hatırlıyorum' demek yalandır."""
+        return not gecmis and re.search(r'(?<!ha)hatırlıyorum|hatirliyorum', cevap.lower()) is not None
+
     def yanit_uret(self, mesaj, gecmis=None):
         """Dışarıya açık tek metot: kullanıcı mesajına cevap üretir."""
         if not self.api_key:
             return ('Şu an demo modundayım. Sorunuzu iletmek için başvuru formunu '
                     'doldurabilir veya digital.ast.tr@gmail.com adresine yazabilirsiniz.')
         cevap = self._temizle(self._groq_istegi(self._mesajlari_hazirla(mesaj, gecmis)))
+
+        # Kod kapıları: kritik kurallar modelin iyi niyetine bırakılmaz
+        if self._hafiza_yalani_mi(cevap, gecmis):
+            return ('Önceki sohbetleri göremiyorum, o yüzden hatırlayamıyorum ama memnuniyetle yardımcı olurum. '
+                    'Etsy mağazanızda ne satıyorsunuz?')
+        if self._ornek_iceriyor_mu(cevap):
+            cevap = self._ornegi_duzelt(cevap)
 
         # Son kapı: tadımlık örnek zaten verildiyse, model kurala uymasa bile ikinci örnek kullanıcıya gitmez
         if self._ornek_verildi_mi(gecmis) and self._ornek_iceriyor_mu(cevap):

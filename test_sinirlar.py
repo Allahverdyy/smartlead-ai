@@ -1,4 +1,6 @@
 """Chatbot'un sınırlarını zorlayan sorular. Her cevap konuya geri dönmeli veya dürüst olmalı."""
+import time
+
 from app.services.ai_service import ai_service
 
 denemeler = [
@@ -18,3 +20,4 @@ denemeler = [
 for baslik, soru in denemeler:
     print(f'\n=== {baslik}: {soru}')
     print(ai_service.yanit_uret(soru))
+    time.sleep(10)   # Groq ücretsiz plan: dakikada 8.000 token sınırına takılmamak için

@@ -112,3 +112,26 @@ def test_cors_wix_izinli(client):
 
 def test_cors_baska_site_engelli(client):
     assert _cors(client, 'https://kotu-site.com') is None
+
+
+# ---------------- Kötüye kullanım ve hata sayfaları ----------------
+
+def test_sohbet_ip_siniri_429(client):
+    kodlar = [client.post('/api/sohbet', json={'mesaj': 'merhaba'}).status_code for _ in range(7)]
+    assert kodlar[:6] == [200] * 6 and kodlar[6] == 429
+
+
+def test_lead_ip_siniri_429(client):
+    kodlar = [client.post('/api/leads', json={'isim': 'Elif', 'telefon': '0555123456' + str(i)}).status_code
+              for i in range(4)]
+    assert kodlar[:3] == [201] * 3 and kodlar[3] == 429
+
+
+def test_404_json_turkce(client):
+    yanit = client.get('/olmayan-adres')
+    assert yanit.status_code == 404
+    assert yanit.get_json()['basari'] is False
+
+
+def test_405_json(client):
+    assert client.get('/api/sohbet').status_code == 405
