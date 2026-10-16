@@ -229,12 +229,13 @@
     const buton = e.target.querySelector('button');
     const isim = document.getElementById('isim').value.trim();
     const telefon = document.getElementById('telefon').value.trim();
-    const kullaniciMesajlari = gecmis.filter(m => m.role === 'user').map(m => m.content);
+    // Sohbetin tamamı, kimin yazdığıyla birlikte (panelde okunabilsin diye)
+    const sohbetDokumu = gecmis.map(m => (m.role === 'user' ? 'Ziyaretçi: ' : 'Asistan: ') + m.content).join('\n');
     buton.disabled = true;
     try {
       const yanit = await fetch('/api/leads', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ isim, telefon, mesaj: kullaniciMesajlari.join(' | ') })
+        body: JSON.stringify({ isim, telefon, mesaj: sohbetDokumu })
       });
       const veri = await yanit.json();
       if (veri.basari) {

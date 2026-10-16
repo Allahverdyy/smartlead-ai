@@ -19,6 +19,10 @@
   th { background:var(--navy); color:var(--krem); text-align:left; padding:12px; font-weight:600; }
   td { padding:12px; border-bottom:1px solid #eee3d2; vertical-align:top; }
   #durum { margin-top:12px; color:#a3301a; }
+  summary { cursor:pointer; color:var(--mercan); font-weight:600; }
+  details p { margin:6px 0; line-height:1.45; white-space:pre-wrap; }
+  details p.ziyaretci { color:var(--navy); }
+  details p.asistan { color:#4A5468; padding-left:12px; border-left:3px solid var(--mercan); }
 </style>
 </head>
 <body>
@@ -38,6 +42,23 @@
   </table>
   <div id="durum"></div>
 <script>
+  // Sohbet dökümü: kapalıyken ilk satır, tıklanınca tamamı (Ziyaretçi / Asistan renkli)
+  function sohbetHucresi(metin) {
+    if (!metin) { const s = document.createElement('span'); s.textContent = '—'; return s; }
+    const det = document.createElement('details');
+    const sum = document.createElement('summary');
+    const satirlar = metin.split('\n');
+    sum.textContent = 'Sohbeti göster (' + satirlar.length + ' mesaj)';
+    det.appendChild(sum);
+    for (const satir of satirlar) {
+      const p = document.createElement('p');
+      p.className = satir.startsWith('Asistan:') ? 'asistan' : 'ziyaretci';
+      p.textContent = satir;
+      det.appendChild(p);
+    }
+    return det;
+  }
+
   async function yukle() {
     const durum = document.getElementById('durum');
     durum.textContent = '';
@@ -52,11 +73,12 @@
       govde.innerHTML = '';
       for (const l of veri.leadler) {
         const tr = document.createElement('tr');
-        for (const deger of [l.id, l.isim, l.telefon, l.etsy_magaza || '—', l.mesaj || '—', l.tarih]) {
+        [l.id, l.isim, l.telefon, l.etsy_magaza || '—', null, l.tarih].forEach((deger) => {
           const td = document.createElement('td');
-          td.textContent = deger;         // XSS'e karşı güvenli
+          if (deger === null) td.appendChild(sohbetHucresi(l.mesaj));
+          else td.textContent = deger;   // XSS'e karşı güvenli
           tr.appendChild(td);
-        }
+        });
         govde.appendChild(tr);
       }
     } catch {

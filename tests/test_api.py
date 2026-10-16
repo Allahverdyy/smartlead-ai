@@ -136,3 +136,10 @@ def test_404_json_turkce(client):
 
 def test_405_json(client):
     assert client.get('/api/sohbet').status_code == 405
+
+
+def test_lead_sohbet_dokumu_saklanir(client):
+    dokum = 'Ziyaretçi: merhaba\nAsistan: Merhaba! Ne satıyorsunuz?\n' + 'x' * 5000
+    client.post('/api/leads', json={'isim': 'Elif', 'telefon': '05551234567', 'mesaj': dokum})
+    kayit = client.get('/api/leads').get_json()['leadler'][0]['mesaj']
+    assert len(kayit) == 4000 and kayit.endswith('x')       # en son kısmı saklanır

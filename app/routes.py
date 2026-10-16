@@ -13,6 +13,8 @@ ISIM_DESENI = re.compile(r"^[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-zÇĞİÖŞÜ�
 TELEFON_DESENI = re.compile(r"^\+?[0-9 ()-]{1,20}$")                                 # rakam, boşluk, + ( ) -
 ETSY_DESENI = re.compile(r"^[A-Za-z0-9]{4,20}$")                                         # Etsy mağaza adı kuralı
 
+MESAJ_SINIRI = 4000   # lead ile kaydedilen sohbet dökümü (son 4000 karakter)
+
 # Blueprint 1: HTML sayfaları
 sayfalar = Blueprint('sayfalar', __name__)
 
@@ -126,7 +128,7 @@ def lead_kaydet():
         return _hata('Etsy mağaza adı 4-20 harf/rakam olmalıdır.', 400)
 
     try:
-        yeni_id = lead_ekle(isim, telefon, mesaj[:1000], etsy_magaza)
+        yeni_id = lead_ekle(isim, telefon, mesaj[-MESAJ_SINIRI:], etsy_magaza)
     except sqlite3.Error:
         return _hata('Kayıt sırasında bir sorun oluştu.', 500)
 
