@@ -27,6 +27,12 @@ def ana_sayfa():
     return render_template('index.html')
 
 
+@sayfalar.route('/widget')
+def widget():
+    """Wix popup'ına gömülen sohbet penceresi (aynı arayüz, kenar boşluksuz ve tam ekran)."""
+    return render_template('index.html', gomulu=True)
+
+
 @sayfalar.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')

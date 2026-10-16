@@ -13,6 +13,7 @@ def test_health(client):
 def test_sayfalar_aciliyor(client):
     assert client.get('/').status_code == 200
     assert client.get('/dashboard').status_code == 200
+    assert client.get('/widget').status_code == 200
 
 
 # ---------------- /api/sohbet ----------------

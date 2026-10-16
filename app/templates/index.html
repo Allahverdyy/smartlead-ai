@@ -67,6 +67,12 @@
   button.ana:disabled { opacity:.5; cursor:default; }
   #sohbetForm { display:flex; gap:8px; padding:12px; border-top:1px solid var(--cizgi); }
   #sohbetForm input { flex:1; }
+{% if gomulu %}
+  /* Wix popup'ı içinde: kenar boşluğu yok, pencere tüm alanı kaplar */
+  body { padding:0; background:var(--navy); align-items:stretch; min-height:0; height:100vh; }
+  .kutu { max-width:none; height:100vh; border-radius:0; box-shadow:none; }
+  header { padding-right:56px; } /* Wix'in kapatma (X) düğmesine yer */
+{% endif %}
 </style>
 </head>
 <body>
