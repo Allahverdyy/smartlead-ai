@@ -67,6 +67,49 @@
   button.ana:disabled { opacity:.5; cursor:default; }
   #sohbetForm { display:flex; gap:8px; padding:12px; border-top:1px solid var(--cizgi); }
   #sohbetForm input { flex:1; }
+
+  /* Üst bilgi düğmesi */
+  header .metin { flex:1; min-width:0; }
+  header h1, header p { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  @media (max-width:440px) { .ikon .yazi { display:none; } .ikon { padding:8px; } }
+  .ikon { background:rgba(242,233,218,.1); color:var(--krem); border:1px solid rgba(242,233,218,.18); border-radius:10px;
+          padding:7px 10px; font:600 12px Inter; cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .ikon:hover { background:rgba(242,233,218,.18); }
+  .ikon svg { width:15px; height:15px; }
+
+  .govde { flex:1; display:flex; flex-direction:column; min-height:0; position:relative; }
+
+  /* Giriş ekranı */
+  #giris { flex:1; overflow-y:auto; padding:30px 26px; display:flex; flex-direction:column; justify-content:center; gap:14px; }
+  #giris .buyuk { width:64px; height:64px; margin:0 auto 4px; }
+  #giris h2 { font:700 19px Sora; text-align:center; }
+  #giris > p { font-size:13.5px; color:#5b5446; text-align:center; line-height:1.5; }
+  #girisForm { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+  #girisForm button { margin-top:4px; }
+  .kvkk { font-size:11px; color:#7a7262; line-height:1.45; text-align:center; }
+  .bag { background:none; border:0; color:var(--navy); font:500 12.5px Inter; text-decoration:underline; cursor:pointer;
+         align-self:center; opacity:.7; }
+  #girisHata { font-size:12.5px; color:#a3301a; text-align:center; min-height:16px; }
+
+  /* Sohbetlerim paneli */
+  #gecmisPanel { position:absolute; inset:0; background:var(--krem); z-index:5; display:none; flex-direction:column; }
+  #gecmisPanel.acik { display:flex; animation:belir .25s ease-out; }
+  .panel-ust { display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px; }
+  .panel-ust b { font:700 15px Sora; }
+  #oturumListe { flex:1; overflow-y:auto; padding:6px 14px 14px; display:flex; flex-direction:column; gap:8px; }
+  .oturum { background:#fff; border:1px solid var(--cizgi); border-radius:14px; padding:11px 12px; display:flex; gap:10px;
+            align-items:center; cursor:pointer; }
+  .oturum.aktif { border-color:var(--mercan); box-shadow:0 0 0 1px var(--mercan) inset; }
+  .oturum .bilgiler { flex:1; min-width:0; }
+  .oturum .baslik { font:600 13.5px Inter; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .oturum .tarih { font-size:11.5px; color:#7a7262; margin-top:2px; }
+  .sil { background:none; border:1px solid transparent; border-radius:8px; color:#a3301a; font:600 11.5px Inter;
+         padding:5px 8px; cursor:pointer; white-space:nowrap; }
+  .sil:hover, .sil.emin { border-color:#f1c4b8; background:#fff1ec; }
+  .panel-alt { padding:10px 14px 14px; display:flex; flex-direction:column; gap:8px; border-top:1px solid var(--cizgi); }
+  .panel-alt .sil { align-self:center; }
+  .bos-liste { text-align:center; color:#7a7262; font-size:13px; padding:30px 0; }
+  .gizli { display:none !important; }
 {% if gomulu %}
   /* Wix popup'ı içinde: kenar boşluğu yok, pencere tüm alanı kaplar */
   body { padding:0; background:var(--navy); align-items:stretch; min-height:0; height:100vh; }
@@ -79,38 +122,104 @@
 <div class="kutu">
   <header>
     <div class="avatar"><img src="{{ url_for('static', filename='ast-sembol.svg') }}" alt="AST Digital"></div>
-    <div>
+    <div class="metin">
       <h1>AST Digital Asistan</h1>
       <p>Çevrimiçi · Etsy mağazanız için buradayız</p>
     </div>
+    <button class="ikon gizli" id="gecmisAc" type="button" title="Sohbetlerim">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>
+      <span class="yazi">Sohbetlerim</span>
+    </button>
   </header>
 
-  <div id="mesajlar"></div>
+  <div class="govde">
+    <!-- 1) Giriş ekranı: sohbetten önce ad ve e-posta -->
+    <section id="giris" class="gizli">
+      <div class="avatar buyuk"><img src="{{ url_for('static', filename='ast-sembol.svg') }}" alt=""></div>
+      <h2>Merhaba! 👋</h2>
+      <p>Etsy mağazanızla ilgili sorularınızı yanıtlayalım. Size nasıl hitap edelim?</p>
+      <form id="girisForm" novalidate>
+        <input id="gIsim" placeholder="Ad Soyad" maxlength="100" autocomplete="name">
+        <input id="gEposta" type="email" inputmode="email" placeholder="E-posta adresiniz" maxlength="120" autocomplete="email">
+        <div id="girisHata"></div>
+        <button class="ana">Sohbete başla</button>
+      </form>
+      <button class="bag" id="girisAtla" type="button">Bilgi vermeden devam et</button>
+      <p class="kvkk">Bilgileriniz yalnızca size dönüş yapmak için kullanılır. Sohbetleriniz bu tarayıcıda saklanır;
+        “Sohbetlerim” bölümünden istediğiniz an silebilirsiniz.</p>
+    </section>
 
-  <div class="donus" id="donus">
-    <button class="donus-ac" id="donusAc" type="button">Size dönüş yapalım <span class="ok">▾</span></button>
-    <form id="leadForm">
-      <label>Ad Soyad
-        <input id="isim" placeholder="Elif Kaya" maxlength="100" autocomplete="name" required minlength="2">
-      </label>
-      <label>Telefon
-        <input id="telefon" type="tel" inputmode="tel" placeholder="05xx xxx xx xx" maxlength="17" autocomplete="tel" required>
-      </label>
-      <button class="ana">Beni arayın</button>
-    </form>
+    <!-- 2) Sohbet -->
+    <div id="sohbetAlani" class="govde gizli">
+      <div id="mesajlar"></div>
+
+      <div class="donus" id="donus">
+        <button class="donus-ac" id="donusAc" type="button">Size dönüş yapalım <span class="ok">▾</span></button>
+        <form id="leadForm">
+          <label>Ad Soyad
+            <input id="isim" placeholder="Elif Kaya" maxlength="100" autocomplete="name" required minlength="2">
+          </label>
+          <label>Telefon
+            <input id="telefon" type="tel" inputmode="tel" placeholder="05xx xxx xx xx" maxlength="17" autocomplete="tel" required>
+          </label>
+          <button class="ana">Beni arayın</button>
+        </form>
+      </div>
+
+      <form id="sohbetForm">
+        <input id="mesaj" placeholder="Mesajınızı yazın..." maxlength="1000" autocomplete="off">
+        <button class="ana">Gönder</button>
+      </form>
+    </div>
+
+    <!-- 3) Sohbetlerim -->
+    <section id="gecmisPanel">
+      <div class="panel-ust">
+        <b>Sohbetlerim</b>
+        <button class="sil" id="gecmisKapat" type="button" style="color:var(--navy)">Kapat ✕</button>
+      </div>
+      <div id="oturumListe"></div>
+      <div class="panel-alt">
+        <button class="ana" id="yeniSohbet" type="button">+ Yeni sohbet</button>
+        <button class="sil" id="hepsiniSil" type="button">Tüm sohbetlerimi ve bilgilerimi sil</button>
+      </div>
+    </section>
   </div>
-
-  <form id="sohbetForm">
-    <input id="mesaj" placeholder="Mesajınızı yazın..." maxlength="1000" autocomplete="off">
-    <button class="ana">Gönder</button>
-  </form>
 </div>
 
 <script>
   const kutu = document.getElementById('mesajlar');
   const AVATAR = "{{ url_for('static', filename='ast-sembol.svg') }}";
-  const gecmis = [];
+  const $ = (id) => document.getElementById(id);
+  const ISIM_DESENI = /^[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-zÇĞİÖŞÜçğıöşü .'-]{1,99}$/;
+  const EPOSTA_DESENI = /^[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
+  // ---------- Tarayıcıda saklama (site kapanıp açılsa da sohbet kalır) ----------
+  // Tarayıcı izin vermezse (gizli sekme vb.) sohbet yine çalışır, sadece sayfa kapanınca kaybolur.
+  const ANAHTAR = 'ast_asistan_v1';
+  const ENFAZLA_OTURUM = 10;
+  function oku() { try { return JSON.parse(localStorage.getItem(ANAHTAR)) || {}; } catch { return {}; } }
+  function kaydet() { try { localStorage.setItem(ANAHTAR, JSON.stringify(durum)); } catch {} }
+  const yeniKimlik = () => (crypto.randomUUID ? crypto.randomUUID()
+                            : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12));
+
+  let durum = oku();
+  durum.oturumlar = durum.oturumlar || {};
+
+  const aktif = () => durum.oturumlar[durum.aktif];
+  const gecmis = () => aktif().gecmis;
+
+  function yeniOturum() {
+    const id = yeniKimlik();
+    durum.oturumlar[id] = { id, gecmis: [], baslangic: new Date().toISOString() };
+    durum.aktif = id;
+    // En eski boş olmayan oturumlar sınırı aşarsa yerelden düşer (sunucudaki kayıt panelde kalır)
+    const liste = Object.values(durum.oturumlar).sort((a, b) => b.baslangic.localeCompare(a.baslangic));
+    liste.slice(ENFAZLA_OTURUM).forEach(o => delete durum.oturumlar[o.id]);
+    kaydet();
+  }
+
+  // ---------- Mesaj çizimi ----------
   const bekle = (ms) => new Promise(r => setTimeout(r, ms));
   const asagiKaydir = () => kutu.scrollTop = kutu.scrollHeight;
 
@@ -156,21 +265,68 @@
     return satir;
   }
 
-  // Açılış mesajı da kısa bir "yazıyor" ile gelsin
-  (async () => {
-    const y = yaziyorGoster();
-    await bekle(1200);
-    y.remove();
-    mesajEkle('Merhaba! Ben AST Digital asistanıyım. Etsy mağazanızla ilgili ne sormak istersiniz?', 'bot');
-  })();
+  const adi = () => (durum.profil && durum.profil.isim) ? durum.profil.isim.split(' ')[0] : '';
+  const acilisMesaji = () => (adi() ? 'Merhaba ' + adi() + '! ' : 'Merhaba! ') +
+    'Ben AST Digital asistanıyım. Etsy mağazanızla ilgili ne sormak istersiniz?';
 
-  // Sohbet
-  document.getElementById('sohbetForm').addEventListener('submit', async (e) => {
+  // Aktif oturumu ekrana çizer: kayıtlı mesajlar varsa onları, yoksa açılış mesajını
+  async function oturumuGoster() {
+    kutu.innerHTML = '';
+    const o = aktif();
+    if (!o.acilis) { o.acilis = acilisMesaji(); kaydet(); }
+    if (!o.gecmis.length) {
+      const y = yaziyorGoster(); await bekle(900); y.remove();
+    }
+    mesajEkle(o.acilis, 'bot');
+    for (const m of o.gecmis) mesajEkle(m.content, m.role === 'user' ? 'kullanici' : 'bot');
+    if (durum.profil && durum.profil.isim) $('isim').value = durum.profil.isim;
+  }
+
+  function ekran(ad) {
+    $('giris').classList.toggle('gizli', ad !== 'giris');
+    $('sohbetAlani').classList.toggle('gizli', ad !== 'sohbet');
+    $('gecmisAc').classList.toggle('gizli', ad === 'giris');
+    if (ad === 'sohbet') $('mesaj').focus();
+  }
+
+  function baslat() {
+    if (!aktif()) yeniOturum();
+    ekran('sohbet');
+    oturumuGoster();
+  }
+
+  // ---------- Giriş ekranı ----------
+  $('girisForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const giris = document.getElementById('mesaj');
+    const isim = $('gIsim').value.trim().replace(/\s+/g, ' ');
+    const eposta = $('gEposta').value.trim().toLowerCase();
+    const hata = $('girisHata'); hata.textContent = '';
+    if (!ISIM_DESENI.test(isim)) { hata.textContent = 'Lütfen adınızı yazın (yalnızca harf).'; return; }
+    if (!EPOSTA_DESENI.test(eposta)) { hata.textContent = 'Lütfen geçerli bir e-posta yazın.'; return; }
+    const buton = e.target.querySelector('button'); buton.disabled = true;
+    if (!aktif()) yeniOturum();
+    try {
+      const yanit = await fetch('/api/leads', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ isim, eposta, mesaj: '', oturum: durum.aktif })
+      });
+      const veri = await yanit.json();
+      if (!veri.basari && yanit.status !== 429) { hata.textContent = veri.hata; buton.disabled = false; return; }
+    } catch { /* sunucuya ulaşılamasa da sohbet açılsın; bilgi sohbet kaydına yine eklenir */ }
+    durum.profil = { isim, eposta }; kaydet();
+    buton.disabled = false;
+    baslat();
+  });
+  $('girisAtla').addEventListener('click', () => { durum.profil = { atla: true }; kaydet(); baslat(); });
+
+  // ---------- Sohbet ----------
+  $('sohbetForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const giris = $('mesaj');
     const buton = e.target.querySelector('button');
     const mesaj = giris.value.trim();
     if (!mesaj) return;
+    const oturumId = durum.aktif;          // cevap gelirken kullanıcı başka sohbete geçse de doğru yere yazılsın
 
     mesajEkle(mesaj, 'kullanici');
     giris.value = '';
@@ -182,10 +338,12 @@
 
     let veri;
     try {
+      const p = durum.profil || {};
       const [yanit] = await Promise.all([
         fetch('/api/sohbet', {
           method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ mesaj, gecmis })
+          body: JSON.stringify({ mesaj, gecmis: durum.oturumlar[oturumId].gecmis, oturum: oturumId,
+                                 isim: p.isim || '', eposta: p.eposta || '' })
         }),
         bekle(enAzSure)
       ]);
@@ -196,8 +354,12 @@
 
     yaziyor.remove();
     if (veri.basari) {
-      mesajEkle(veri.cevap, 'bot');
-      gecmis.push({role: 'user', content: mesaj}, {role: 'assistant', content: veri.cevap});
+      durum.oturumlar[oturumId].gecmis.push({role: 'user', content: mesaj}, {role: 'assistant', content: veri.cevap});
+      kaydet();
+      if (oturumId === durum.aktif) {
+        mesajEkle(veri.cevap, 'bot');
+        if (veri.kaydedildi) bilgiEkle('✓ Bilgileriniz ekibimize iletildi.', 'basarili');
+      }
     } else {
       bilgiEkle(veri.hata, 'hata');
     }
@@ -205,42 +367,42 @@
     giris.focus();
   });
 
-  // Dönüş formu aç/kapa
-  const donus = document.getElementById('donus');
-  document.getElementById('donusAc').addEventListener('click', () => {
+  // ---------- Size dönüş yapalım formu ----------
+  const donus = $('donus');
+  $('donusAc').addEventListener('click', () => {
     donus.classList.toggle('acik');
-    if (donus.classList.contains('acik')) document.getElementById('isim').focus();
+    if (donus.classList.contains('acik')) ($('isim').value ? $('telefon') : $('isim')).focus();
   });
 
   // Alanlara yalnızca izin verilen karakterler yazılabilsin (asıl kontrol sunucuda)
   function suz(id, izinsiz) {
-    const alan = document.getElementById(id);
+    const alan = $(id);
     alan.addEventListener('input', () => {
       const temiz = alan.value.replace(izinsiz, '');
       if (temiz !== alan.value) alan.value = temiz;
     });
   }
   suz('isim', /[^A-Za-zÇĞİÖŞÜçğıöşü .'-]/g);   // sadece harf, boşluk, . ' -
+  suz('gIsim', /[^A-Za-zÇĞİÖŞÜçğıöşü .'-]/g);
   suz('telefon', /[^0-9 +()-]/g);              // sadece rakam, boşluk, + ( ) -
 
-  // Lead kaydı
-  document.getElementById('leadForm').addEventListener('submit', async (e) => {
+  $('leadForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const buton = e.target.querySelector('button');
-    const isim = document.getElementById('isim').value.trim();
-    const telefon = document.getElementById('telefon').value.trim();
+    const isim = $('isim').value.trim();
+    const telefon = $('telefon').value.trim();
     // Sohbetin tamamı, kimin yazdığıyla birlikte (panelde okunabilsin diye)
-    const sohbetDokumu = gecmis.map(m => (m.role === 'user' ? 'Ziyaretçi: ' : 'Asistan: ') + m.content).join('\n');
+    const sohbetDokumu = gecmis().map(m => (m.role === 'user' ? 'Ziyaretçi: ' : 'Asistan: ') + m.content).join('\n');
     buton.disabled = true;
     try {
       const yanit = await fetch('/api/leads', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ isim, telefon, mesaj: sohbetDokumu })
+        body: JSON.stringify({ isim, telefon, eposta: (durum.profil || {}).eposta || '', mesaj: sohbetDokumu, oturum: durum.aktif })
       });
       const veri = await yanit.json();
       if (veri.basari) {
         bilgiEkle('✓ ' + veri.mesaj, 'basarili');
-        e.target.reset();
+        $('telefon').value = '';
         donus.classList.remove('acik');
       } else {
         bilgiEkle(veri.hata, 'hata');
@@ -250,6 +412,61 @@
     }
     buton.disabled = false;
   });
+
+  // ---------- Sohbetlerim ----------
+  const tarihYaz = (iso) => new Date(iso).toLocaleString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+
+  async function sunucudanSil(id) {
+    try { await fetch('/api/sohbet/' + encodeURIComponent(id), { method: 'DELETE' }); } catch {}
+  }
+
+  function listeyiCiz() {
+    const liste = $('oturumListe'); liste.innerHTML = '';
+    const oturumlar = Object.values(durum.oturumlar).sort((a, b) => b.baslangic.localeCompare(a.baslangic));
+    if (!oturumlar.length) { const b = document.createElement('div'); b.className = 'bos-liste'; b.textContent = 'Kayıtlı sohbet yok.'; liste.appendChild(b); }
+    for (const o of oturumlar) {
+      const satir = document.createElement('div');
+      satir.className = 'oturum' + (o.id === durum.aktif ? ' aktif' : '');
+      const bilgi = document.createElement('div'); bilgi.className = 'bilgiler';
+      const ilk = o.gecmis.find(m => m.role === 'user');
+      const baslik = document.createElement('div'); baslik.className = 'baslik';
+      baslik.textContent = ilk ? ilk.content : 'Yeni sohbet';
+      const tarih = document.createElement('div'); tarih.className = 'tarih';
+      tarih.textContent = tarihYaz(o.baslangic) + ' · ' + (o.gecmis.length / 2) + ' mesaj' + (o.id === durum.aktif ? ' · açık' : '');
+      bilgi.append(baslik, tarih);
+      const sil = document.createElement('button'); sil.className = 'sil'; sil.type = 'button'; sil.textContent = 'Sil';
+      sil.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        if (!sil.classList.contains('emin')) { sil.classList.add('emin'); sil.textContent = 'Emin misiniz?'; return; }
+        await sunucudanSil(o.id);
+        delete durum.oturumlar[o.id];
+        if (durum.aktif === o.id) { durum.aktif = null; yeniOturum(); oturumuGoster(); }
+        kaydet(); listeyiCiz();
+      });
+      satir.append(bilgi, sil);
+      satir.addEventListener('click', () => { durum.aktif = o.id; kaydet(); panel(false); oturumuGoster(); });
+      liste.appendChild(satir);
+    }
+  }
+
+  function panel(ac) { $('gecmisPanel').classList.toggle('acik', ac); if (ac) listeyiCiz(); }
+  $('gecmisAc').addEventListener('click', () => panel(!$('gecmisPanel').classList.contains('acik')));
+  $('gecmisKapat').addEventListener('click', () => panel(false));
+  $('yeniSohbet').addEventListener('click', () => { yeniOturum(); panel(false); oturumuGoster(); });
+
+  const hepsi = $('hepsiniSil');
+  hepsi.addEventListener('click', async () => {
+    if (!hepsi.classList.contains('emin')) { hepsi.classList.add('emin'); hepsi.textContent = 'Emin misiniz? Tekrar tıklayın'; return; }
+    await Promise.all(Object.keys(durum.oturumlar).map(sunucudanSil));
+    durum = { oturumlar: {} }; kaydet();
+    try { localStorage.removeItem(ANAHTAR); } catch {}
+    hepsi.classList.remove('emin'); hepsi.textContent = 'Tüm sohbetlerimi ve bilgilerimi sil';
+    panel(false); $('gIsim').value = $('gEposta').value = $('isim').value = '';
+    ekran('giris');
+  });
+
+  // ---------- Açılış ----------
+  if (durum.profil) baslat(); else ekran('giris');
 </script>
 </body>
 </html>

@@ -101,3 +101,21 @@ def test_hatirlamiyorum_dokunulmaz():
     servis = AIService(api_key='x')
     servis._groq_istegi = lambda m: 'Sizi hatırlamıyorum ama yardımcı olurum.'
     assert servis.yanit_uret('beni hatırladın mı?', []) == 'Sizi hatırlamıyorum ama yardımcı olurum.'
+
+
+def test_sahte_form_satirlari_silinir():
+    metin = ('Üzgünüm, kayıt işlemini doğrudan yapamıyorum.\nSize dönüş yapalım\nAdınız:\nTelefon:\nE-posta:\n'
+             'İlgili ürün veya hizmet:\nEkibimiz mesai saatlerinde sizinle iletişime geçecektir.')
+    temiz = AIService._sahte_formu_temizle(metin)
+    assert 'Adınız:' not in temiz and 'Telefon:' not in temiz and 'E-posta:' not in temiz
+    assert 'Size dönüş yapalım' in temiz
+
+
+def test_normal_cevaptaki_iki_nokta_dokunulmaz():
+    metin = 'Başlık: Cat Mug Gift\nEtiketler: cat mug, gift'
+    assert AIService._sahte_formu_temizle(metin) == metin
+
+
+def test_iletisim_alindi_notu_eklenir():
+    mesajlar = AIService(api_key='x')._mesajlari_hazirla('ali 05551112233', [], iletisim_alindi=True)
+    assert mesajlar[-2]['role'] == 'system' and 'kaydetti' in mesajlar[-2]['content']

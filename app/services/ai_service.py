@@ -18,6 +18,14 @@ YASAKLI_IFADELER = ['official', 'licensed', 'authentic', 'fifa', 'world cup', 'w
                     'nationalteam', 'disney', 'marvel', 'nike', 'adidas', 'nba', 'nfl', 'uefa', 'premier league']
 ORNEK_ETIKET_SINIRI = 5
 
+# Model bazen sohbetin içine boş form taklidi yazıyor ("Adınız:", "Telefon:"). Bu satırlar kullanıcıya gitmez.
+SAHTE_FORM_SATIRI = re.compile(
+    r"^\s*[-•*]?\s*(ad[ıi]n[ıi]z|ad soyad[ıi]?|ad[ıi]n[ıi]z soyad[ıi]n[ıi]z|isim|[ıi]sminiz|telefon(unuz| numaran[ıi]z)?|"
+    r"e-?posta(n[ıi]z)?|e-?mail|mail|ilgili [üu]r[üu]n.*|mesaj[ıi]n[ıi]z|etsy ma[ğg]aza(n[ıi]z)?)\s*:\s*_*\s*$", re.I)
+FORM_BASLIGI = re.compile(r"^\s*size d[öo]n[üu][şs] yapal[ıi]m\s*:?\s*$", re.I)
+FORM_YONLENDIRME = ("Alttaki \"Size dönüş yapalım\" bölümüne adınızı ve telefonunuzu bırakabilirsiniz; "
+                    "isterseniz buraya da yazabilirsiniz, ekibimiz mesai saatlerinde sizi arar.")
+
 
 class AIServiceError(Exception):
     """Yapay zekâ servisine ulaşılamadığında fırlatılır; routes.py bunu 503 olarak döner."""
@@ -34,7 +42,7 @@ class AIService:
         """Chatbot'un kim olduğunu ve nasıl davranacağını config'den okur."""
         return Config.BUSINESS_CONTEXT
 
-    def _mesajlari_hazirla(self, mesaj, gecmis):
+    def _mesajlari_hazirla(self, mesaj, gecmis, iletisim_alindi=False, isim=None):
         """Sıra: sistem talimatı -> geçmiş konuşma -> yeni kullanıcı mesajı."""
         mesajlar = [{'role': 'system', 'content': self._sistem_talimati()}]
         for kayit in (gecmis or [])[-GECMIS_SINIRI:]:      # son mesajlar yeterli, token kotasını korur
@@ -46,6 +54,15 @@ class AIService:
             mesajlar.append({'role': 'system', 'content': (
                 'Bu sohbette tadımlık başlık/etiket örneği zaten verildi. Yeni başlık, etiket veya '
                 'varyasyon yazma; kullanıcıyı nazikçe listing aracına ve Size dönüş yapalım bölümüne yönlendir.')})
+        if isim:
+            mesajlar.append({'role': 'system', 'content': (
+                f'Ziyaretçinin adı: {isim}. Gerekirse adıyla hitap et; cinsiyet tahmin etme (Bey/Hanım deme). '
+                'Adını ve e-postasını zaten verdi, tekrar isteme.')})
+        if iletisim_alindi:
+            mesajlar.append({'role': 'system', 'content': (
+                'Kullanıcı son mesajında adını ve telefonunu yazdı; sistem bunu kaydetti ve ekibe iletti. '
+                'Tek cümleyle teşekkür et, ekibin mesai saatlerinde arayacağını söyle. Formu tekrar isteme, '
+                '"kayıt yapamıyorum" deme. Sonra en fazla bir kısa soru sor.')})
         mesajlar.append({'role': 'user', 'content': mesaj})
         return mesajlar
 
@@ -95,6 +112,19 @@ class AIService:
         return metin.replace('**', '').replace('__', '').strip()
 
     @staticmethod
+    def _sahte_formu_temizle(metin):
+        """'Adınız:', 'Telefon:' gibi boş form satırlarını siler; yerine tek bir yönlendirme cümlesi koyar."""
+        satirlar = metin.split('\n')
+        kalan = [s for s in satirlar if not SAHTE_FORM_SATIRI.match(s)]
+        if len(kalan) == len(satirlar):
+            return metin
+        kalan = [s for s in kalan if not FORM_BASLIGI.match(s)]
+        govde = re.sub(r'\n{3,}', '\n\n', '\n'.join(kalan)).strip()
+        if 'size dönüş yapalım' not in govde.lower():
+            govde = (govde + '\n' + FORM_YONLENDIRME).strip()
+        return govde
+
+    @staticmethod
     def _yasakli_mi(parca):
         p = parca.lower()
         return any(ifade in p for ifade in YASAKLI_IFADELER)
@@ -121,12 +151,15 @@ class AIService:
         """Sohbet geçmişi yokken 'hatırlıyorum' demek yalandır."""
         return not gecmis and re.search(r'(?<!ha)hatırlıyorum|hatirliyorum', cevap.lower()) is not None
 
-    def yanit_uret(self, mesaj, gecmis=None):
+    def yanit_uret(self, mesaj, gecmis=None, iletisim_alindi=False, isim=None):
         """Dışarıya açık tek metot: kullanıcı mesajına cevap üretir."""
         if not self.api_key:
+            if iletisim_alindi:
+                return 'Teşekkürler, bilgilerinizi aldım; ekibimiz mesai saatlerinde sizi arayacak.'
             return ('Şu an demo modundayım. Sorunuzu iletmek için başvuru formunu '
                     'doldurabilir veya digital.ast.tr@gmail.com adresine yazabilirsiniz.')
-        cevap = self._temizle(self._groq_istegi(self._mesajlari_hazirla(mesaj, gecmis)))
+        cevap = self._temizle(self._groq_istegi(self._mesajlari_hazirla(mesaj, gecmis, iletisim_alindi, isim)))
+        cevap = self._sahte_formu_temizle(cevap)
 
         # Kod kapıları: kritik kurallar modelin iyi niyetine bırakılmaz
         if self._hafiza_yalani_mi(cevap, gecmis):
