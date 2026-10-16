@@ -4,88 +4,183 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Yönetim Paneli · SmartLead AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --navy:#0F1B33; --mercan:#FF6B4A; --krem:#F2E9DA; }
+  :root { --navy:#0F1B33; --navy2:#172644; --mercan:#FF6B4A; --krem:#F2E9DA; --kum:#FAF7F2; --gri:#4A5468; --cizgi:#E4D8C4; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:Inter, sans-serif; background:var(--krem); color:var(--navy); padding:32px; }
-  h1 { font-family:Sora, sans-serif; font-size:24px; }
-  .ust { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:12px; flex-wrap:wrap; }
-  .ozet { color:var(--mercan); font-weight:600; margin-top:4px; }
-  input, button { padding:9px 12px; border-radius:8px; font:inherit; font-size:14px; }
-  input { border:1px solid #d9ccb6; }
-  button { background:var(--navy); color:#fff; border:0; cursor:pointer; }
-  table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; font-size:14px; }
-  th { background:var(--navy); color:var(--krem); text-align:left; padding:12px; font-weight:600; }
-  td { padding:12px; border-bottom:1px solid #eee3d2; vertical-align:top; }
-  #durum { margin-top:12px; color:#a3301a; }
-  summary { cursor:pointer; color:var(--mercan); font-weight:600; }
-  details p { margin:6px 0; line-height:1.45; white-space:pre-wrap; }
-  details p.ziyaretci { color:var(--navy); }
-  details p.asistan { color:#4A5468; padding-left:12px; border-left:3px solid var(--mercan); }
+  body { font-family:Inter, sans-serif; background:var(--kum); color:var(--navy); }
+
+  /* Üst bant */
+  .ust { background:var(--navy); color:var(--krem); padding:22px 32px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .ust img { width:40px; }
+  .ust h1 { font-family:Sora, sans-serif; font-size:20px; flex:1; }
+  .ust h1 small { display:block; font:400 12px Inter; opacity:.65; margin-top:2px; }
+  .anahtar { display:flex; gap:8px; }
+  .anahtar input { padding:9px 12px; border-radius:10px; border:1px solid #2b3a5c; background:var(--navy2); color:var(--krem); font:inherit; font-size:13px; width:230px; }
+  button { background:var(--mercan); color:#fff; border:0; border-radius:10px; padding:9px 16px; font:600 13px Inter; cursor:pointer; }
+
+  main { max-width:1080px; margin:0 auto; padding:28px 32px 60px; }
+
+  /* KPI kartları */
+  .kpiler { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin-bottom:24px; }
+  .kpi { background:#fff; border:1px solid var(--cizgi); border-radius:16px; padding:16px 18px; }
+  .kpi b { display:block; font:700 28px Sora; }
+  .kpi span { font-size:12px; color:var(--gri); text-transform:uppercase; letter-spacing:.06em; }
+  .kpi.vurgu b { color:var(--mercan); }
+
+  .arama { width:100%; padding:11px 14px; border:1px solid var(--cizgi); border-radius:12px; font:inherit; font-size:14px; margin-bottom:16px; background:#fff; }
+  #durum { color:#a3301a; margin-bottom:12px; font-size:14px; }
+
+  /* Lead kartı */
+  .lead { background:#fff; border:1px solid var(--cizgi); border-radius:18px; margin-bottom:14px; overflow:hidden; }
+  .lead-ust { display:flex; align-items:center; gap:14px; padding:16px 18px; cursor:pointer; }
+  .bas { width:44px; height:44px; border-radius:50%; background:var(--navy); color:var(--krem); display:grid; place-items:center; font:700 15px Sora; flex-shrink:0; }
+  .kim { flex:1; min-width:0; }
+  .kim b { font:600 15px Sora; }
+  .kim .alt { font-size:13px; color:var(--gri); margin-top:3px; display:flex; gap:14px; flex-wrap:wrap; }
+  .kim a { color:var(--navy); text-decoration:none; border-bottom:1px dashed var(--cizgi); }
+  .onizleme { font-size:13px; color:var(--gri); margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sag { text-align:right; font-size:12px; color:var(--gri); flex-shrink:0; }
+  .rozet { display:inline-block; background:#fff1ec; color:var(--mercan); border-radius:20px; padding:3px 10px; font-weight:600; margin-top:6px; }
+  .ok { transition:transform .25s; display:inline-block; margin-left:6px; color:var(--mercan); }
+  .lead.acik .ok { transform:rotate(180deg); }
+
+  /* Sohbet: sitedeki pencerenin "ekran görüntüsü" gibi */
+  .sohbet-alan { display:none; padding:4px 18px 20px; }
+  .lead.acik .sohbet-alan { display:block; }
+  .pencere { max-width:440px; margin:0 auto; border-radius:18px; overflow:hidden; box-shadow:0 12px 30px rgba(15,27,51,.18); }
+  .pencere-ust { background:var(--navy); color:var(--krem); padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:3px solid var(--mercan); }
+  .pencere-ust .av { width:30px; height:30px; border-radius:50%; border:1.5px solid var(--mercan); display:grid; place-items:center; }
+  .pencere-ust .av img { width:62%; }
+  .pencere-ust b { font:700 14px Sora; }
+  .pencere-ust small { display:block; font-size:11px; opacity:.7; }
+  .mesajlar { background:var(--krem); padding:14px 12px; display:flex; flex-direction:column; gap:10px; max-height:520px; overflow-y:auto; }
+  .satir { display:flex; align-items:flex-end; gap:8px; }
+  .satir.sag-taraf { justify-content:flex-end; }
+  .satir .av { width:26px; height:26px; border-radius:50%; background:var(--navy); border:1.5px solid var(--mercan); display:grid; place-items:center; flex-shrink:0; }
+  .satir .av img { width:62%; }
+  .balon { max-width:80%; padding:9px 13px; border-radius:15px; font-size:13.5px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+  .bot { background:#fff; border-bottom-left-radius:4px; }
+  .ziy { background:var(--mercan); color:#fff; border-bottom-right-radius:4px; }
+  .bos { text-align:center; color:var(--gri); padding:50px 0; }
 </style>
 </head>
 <body>
-  <div class="ust">
-    <div>
-      <h1>Yönetim Paneli</h1>
-      <div class="ozet" id="ozet">Yükleniyor...</div>
-    </div>
-    <div>
-      <input id="anahtar" type="password" placeholder="Yönetici anahtarı (canlıda)">
-      <button id="yenile">Yenile</button>
-    </div>
+<div class="ust">
+  <img src="{{ url_for('static', filename='ast-sembol.svg') }}" alt="AST Digital">
+  <h1>Yönetim Paneli<small>SmartLead AI · potansiyel müşteriler ve sohbetleri</small></h1>
+  <div class="anahtar">
+    <input id="anahtar" type="password" placeholder="Yönetici anahtarı">
+    <button id="yenile">Yenile</button>
   </div>
-  <table>
-    <thead><tr><th>#</th><th>İsim</th><th>Telefon</th><th>Etsy Mağazası</th><th>Mesaj</th><th>Tarih</th></tr></thead>
-    <tbody id="satirlar"></tbody>
-  </table>
+</div>
+
+<main>
+  <div class="kpiler">
+    <div class="kpi"><b id="kToplam">–</b><span>Toplam lead</span></div>
+    <div class="kpi vurgu"><b id="kBugun">–</b><span>Bugün</span></div>
+    <div class="kpi"><b id="kHafta">–</b><span>Son 7 gün</span></div>
+  </div>
+  <input class="arama" id="arama" placeholder="İsim, telefon veya sohbet içinde ara…">
   <div id="durum"></div>
+  <div id="liste"></div>
+</main>
+
 <script>
-  // Sohbet dökümü: kapalıyken ilk satır, tıklanınca tamamı (Ziyaretçi / Asistan renkli)
-  function sohbetHucresi(metin) {
-    if (!metin) { const s = document.createElement('span'); s.textContent = '—'; return s; }
-    const det = document.createElement('details');
-    const sum = document.createElement('summary');
-    const satirlar = metin.split('\n');
-    sum.textContent = 'Sohbeti göster (' + satirlar.length + ' mesaj)';
-    det.appendChild(sum);
-    for (const satir of satirlar) {
-      const p = document.createElement('p');
-      p.className = satir.startsWith('Asistan:') ? 'asistan' : 'ziyaretci';
-      p.textContent = satir;
-      det.appendChild(p);
+  const SEMBOL = "{{ url_for('static', filename='ast-sembol.svg') }}";
+  let tumLeadler = [];
+
+  // Kayıtlı dökümü mesajlara çevirir. "Ziyaretçi:" / "Asistan:" ile başlamayan satır, önceki mesajın devamıdır.
+  function sohbetiAyristir(metin) {
+    const mesajlar = [];
+    for (const satir of (metin || '').split('\n')) {
+      const m = satir.match(/^(Ziyaretçi|Asistan):\s?(.*)$/);
+      if (m) mesajlar.push({ kim: m[1] === 'Asistan' ? 'bot' : 'ziy', metin: m[2] });
+      else if (mesajlar.length) mesajlar[mesajlar.length - 1].metin += '\n' + satir;
+      else if (satir.trim()) satir.split(' | ').forEach(p => p.trim() && mesajlar.push({ kim: 'ziy', metin: p.trim() }));   // eski kayıtlar
     }
-    return det;
+    return mesajlar;
+  }
+
+  const el = (etiket, sinif, metin) => { const e = document.createElement(etiket); if (sinif) e.className = sinif; if (metin !== undefined) e.textContent = metin; return e; };
+  const avatar = () => { const a = el('div', 'av'); const i = document.createElement('img'); i.src = SEMBOL; i.alt = ''; a.appendChild(i); return a; };
+  const basHarf = (isim) => isim.split(' ').slice(0, 2).map(k => k[0] ? k[0].toLocaleUpperCase('tr') : '').join('');
+  const tarihYaz = (t) => { const d = new Date(t.replace(' ', 'T')); return isNaN(d) ? t : d.toLocaleString('tr-TR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }); };
+
+  function kart(l) {
+    const mesajlar = sohbetiAyristir(l.mesaj);
+    const k = el('div', 'lead');
+    const ust = el('div', 'lead-ust');
+    ust.appendChild(el('div', 'bas', basHarf(l.isim)));
+
+    const kim = el('div', 'kim');
+    kim.appendChild(el('b', '', l.isim));
+    const alt = el('div', 'alt');
+    const tel = el('a', '', l.telefon); tel.href = 'tel:' + l.telefon; tel.onclick = (e) => e.stopPropagation();
+    alt.appendChild(tel);
+    if (l.etsy_magaza) alt.appendChild(el('span', '', '🛍 ' + l.etsy_magaza));
+    kim.appendChild(alt);
+    const sonZiy = [...mesajlar].reverse().find(m => m.kim === 'ziy');
+    kim.appendChild(el('div', 'onizleme', sonZiy ? '“' + sonZiy.metin + '”' : 'Sohbet kaydı yok'));
+    ust.appendChild(kim);
+
+    const sag = el('div', 'sag', tarihYaz(l.tarih));
+    sag.appendChild(document.createElement('br'));
+    const rozet = el('span', 'rozet', mesajlar.length + ' mesaj');
+    rozet.appendChild(el('span', 'ok', '▾'));
+    sag.appendChild(rozet);
+    ust.appendChild(sag);
+    k.appendChild(ust);
+
+    // Sohbet penceresi
+    const alan = el('div', 'sohbet-alan');
+    const pen = el('div', 'pencere');
+    const pu = el('div', 'pencere-ust'); pu.appendChild(avatar());
+    const pb = el('div'); pb.appendChild(el('b', '', 'AST Digital Asistan')); pb.appendChild(el('small', '', l.isim + ' ile sohbet · ' + tarihYaz(l.tarih)));
+    pu.appendChild(pb); pen.appendChild(pu);
+    const ml = el('div', 'mesajlar');
+    if (!mesajlar.length) ml.appendChild(el('div', 'bos', 'Bu kayıtta sohbet yok.'));
+    for (const m of mesajlar) {
+      const s = el('div', 'satir' + (m.kim === 'ziy' ? ' sag-taraf' : ''));
+      if (m.kim === 'bot') s.appendChild(avatar());
+      s.appendChild(el('div', 'balon ' + m.kim, m.metin));   // textContent: XSS'e karşı güvenli
+      ml.appendChild(s);
+    }
+    pen.appendChild(ml); alan.appendChild(pen); k.appendChild(alan);
+    ust.addEventListener('click', () => k.classList.toggle('acik'));
+    return k;
+  }
+
+  function goster(leadler) {
+    const liste = document.getElementById('liste'); liste.innerHTML = '';
+    if (!leadler.length) { liste.appendChild(el('div', 'bos', 'Gösterilecek kayıt yok.')); return; }
+    leadler.forEach(l => liste.appendChild(kart(l)));
+  }
+
+  function kpiGuncelle(leadler) {
+    const simdi = new Date(), bugun = simdi.toDateString();
+    const d = (l) => new Date(l.tarih.replace(' ', 'T'));
+    document.getElementById('kToplam').textContent = leadler.length;
+    document.getElementById('kBugun').textContent = leadler.filter(l => d(l).toDateString() === bugun).length;
+    document.getElementById('kHafta').textContent = leadler.filter(l => simdi - d(l) < 7 * 864e5).length;
   }
 
   async function yukle() {
-    const durum = document.getElementById('durum');
-    durum.textContent = '';
+    const durum = document.getElementById('durum'); durum.textContent = '';
     try {
-      const yanit = await fetch('/api/leads', {
-        headers: { 'X-Admin-Key': document.getElementById('anahtar').value }
-      });
+      const yanit = await fetch('/api/leads', { headers: { 'X-Admin-Key': document.getElementById('anahtar').value } });
       const veri = await yanit.json();
       if (!veri.basari) { durum.textContent = veri.hata; return; }
-      document.getElementById('ozet').textContent = veri.adet + ' potansiyel müşteri';
-      const govde = document.getElementById('satirlar');
-      govde.innerHTML = '';
-      for (const l of veri.leadler) {
-        const tr = document.createElement('tr');
-        [l.id, l.isim, l.telefon, l.etsy_magaza || '—', null, l.tarih].forEach((deger) => {
-          const td = document.createElement('td');
-          if (deger === null) td.appendChild(sohbetHucresi(l.mesaj));
-          else td.textContent = deger;   // XSS'e karşı güvenli
-          tr.appendChild(td);
-        });
-        govde.appendChild(tr);
-      }
-    } catch {
-      durum.textContent = 'Sunucuya ulaşılamadı.';
-    }
+      tumLeadler = veri.leadler; kpiGuncelle(tumLeadler); goster(tumLeadler);
+    } catch { durum.textContent = 'Sunucuya ulaşılamadı.'; }
   }
+
+  document.getElementById('arama').addEventListener('input', (e) => {
+    const q = e.target.value.toLocaleLowerCase('tr').trim();
+    goster(!q ? tumLeadler : tumLeadler.filter(l => [l.isim, l.telefon, l.mesaj || '', l.etsy_magaza || ''].join(' ').toLocaleLowerCase('tr').includes(q)));
+  });
   document.getElementById('yenile').addEventListener('click', yukle);
+  document.getElementById('anahtar').addEventListener('keydown', (e) => { if (e.key === 'Enter') yukle(); });
   yukle();
 </script>
 </body>

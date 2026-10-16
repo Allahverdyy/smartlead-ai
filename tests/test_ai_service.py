@@ -12,7 +12,7 @@ def test_mesaj_sirasi_ve_gecmis_siniri():
     mesajlar = servis._mesajlari_hazirla('yeni', gecmis)
     assert mesajlar[0]['role'] == 'system'                 # önce sistem talimatı
     assert mesajlar[-1] == {'role': 'user', 'content': 'yeni'}   # en sonda yeni mesaj
-    assert len(mesajlar) == 1 + 8 + 1                       # geçmişten yalnızca son 8
+    assert len(mesajlar) == 1 + 12 + 1                      # geçmişten yalnızca son 12
 
 
 def test_gecersiz_gecmis_kayitlari_atlanir():
@@ -69,8 +69,10 @@ def test_429_devam_ederse_anlasilir_hata(monkeypatch):
 
 def test_uzun_gecmis_mesaji_kirpilir():
     servis = AIService(api_key='x')
-    mesajlar = servis._mesajlari_hazirla('yeni', [{'role': 'user', 'content': 'a' * 5000}])
-    assert len(mesajlar[1]['content']) == 600
+    mesajlar = servis._mesajlari_hazirla('yeni', [{'role': 'user', 'content': 'a' * 5000},
+                                                  {'role': 'assistant', 'content': 'b' * 5000}])
+    assert len(mesajlar[1]['content']) == 500     # kullanıcının bilgisi korunur
+    assert len(mesajlar[2]['content']) == 220     # botun uzun cevabı kısaltılır
 
 
 def test_sistem_talimati_kisa():

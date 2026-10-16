@@ -8,9 +8,10 @@ GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 MODEL = Config.GROQ_MODEL
 
 # Groq ücretsiz plan: dakikada 8.000 token. Her istekte giden metni sınırlı tutuyoruz.
-GECMIS_SINIRI = 8              # geçmişten en fazla 8 mesaj
-MESAJ_KARAKTER_SINIRI = 600    # geçmişteki her mesajdan en fazla 600 karakter
-CEVAP_TOKEN_SINIRI = 600
+GECMIS_SINIRI = 12             # geçmişten en fazla 12 mesaj (6 tur)
+KULLANICI_KARAKTER_SINIRI = 500  # kullanıcının verdiği bilgiler kaybolmasın
+ASISTAN_KARAKTER_SINIRI = 220    # botun eski cevapları kısaltılarak gönderilir (bağlam için yeterli)
+CEVAP_TOKEN_SINIRI = 450
 
 # Marka/telif riski taşıyan ifadeler: öneride asla kullanıcıya gitmez (listing aracındaki enforce_brand mantığı)
 YASAKLI_IFADELER = ['official', 'licensed', 'authentic', 'fifa', 'world cup', 'worldcup', 'olympic', 'national team',
@@ -38,7 +39,8 @@ class AIService:
         mesajlar = [{'role': 'system', 'content': self._sistem_talimati()}]
         for kayit in (gecmis or [])[-GECMIS_SINIRI:]:      # son mesajlar yeterli, token kotasını korur
             if kayit.get('role') in ('user', 'assistant') and kayit.get('content'):
-                icerik = str(kayit['content'])[:MESAJ_KARAKTER_SINIRI]
+                sinir = KULLANICI_KARAKTER_SINIRI if kayit['role'] == 'user' else ASISTAN_KARAKTER_SINIRI
+                icerik = str(kayit['content'])[:sinir]
                 mesajlar.append({'role': kayit['role'], 'content': icerik})
         if self._ornek_verildi_mi(gecmis):
             mesajlar.append({'role': 'system', 'content': (
