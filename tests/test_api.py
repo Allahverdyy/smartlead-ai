@@ -253,3 +253,8 @@ def test_ziyaretci_sohbetini_silebilir(client):
 
 def test_gecersiz_oturum_silinemez(client):
     assert client.delete('/api/sohbet/kisa').status_code == 400
+
+
+def test_sayfalar_onbellege_alinmaz(client):
+    for adres in ('/widget', '/dashboard', '/health'):
+        assert client.get(adres).headers.get('Cache-Control') == 'no-store'

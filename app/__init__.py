@@ -26,6 +26,13 @@ def create_app(ortam='default', **ek_ayarlar):
     app.register_blueprint(sayfalar)
     app.register_blueprint(api)
 
+    @app.after_request
+    def onbellek_kapat(yanit):
+        # HTML sayfaları ve API cevapları tarayıcıda saklanmasın: her push'tan sonra herkes yeni sürümü görsün
+        if yanit.mimetype in ('text/html', 'application/json'):
+            yanit.headers['Cache-Control'] = 'no-store'
+        return yanit
+
     # Hata sayfaları da JSON ve Türkçe olsun (Wix tarafı her zaman aynı biçimi okur)
     @app.errorhandler(404)
     def bulunamadi(e):
