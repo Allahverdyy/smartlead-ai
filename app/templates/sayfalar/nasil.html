@@ -1,0 +1,25 @@
+{% extends "site.html" %}
+{% block baslik %}Nasıl çalışır · AST Digital{% endblock %}
+{% block icerik %}
+<section class="page-hero">
+  <div class="wrap">
+    <h1>Üyelik başvuruyla açılır.</h1>
+    <p>Sahte ve tekrar eden hesapları önlemek için her başvuruyu tek tek inceliyoruz. Üç adımda hazırsın.</p>
+  </div>
+</section>
+<section id="nasil">
+  <div class="wrap">
+    <div class="steps">
+      <div class="step"><h3>Başvur</h3><p>Ad, e-posta, WhatsApp ve Etsy mağaza linkinle kısa formu doldur.</p></div>
+      <div class="step"><h3>Onay al</h3><p>Başvurunu inceler, aynı gün içinde e-postayla dönüş yaparız.</p></div>
+      <div class="step"><h3>Araçları kullan</h3><p>Günlük haklarınla listing ve mockup hazırla; takıldığında bize yaz.</p></div>
+    </div>
+  </div>
+</section>
+<section class="cta-band">
+  <div class="wrap">
+    <div><h2>Hazırsan başlayalım.</h2><p>Ücretsiz planla başla. Başvurunu aynı gün inceleyip e-postayla dönüş yaparız.</p></div>
+    <div class="row"><a class="btn btn-primary" href="{{ url_for('sayfalar.basvuru') }}">Başvur</a><button class="btn btn-ghost" type="button" data-chat>Asistana sor</button></div>
+  </div>
+</section>
+{% endblock %}

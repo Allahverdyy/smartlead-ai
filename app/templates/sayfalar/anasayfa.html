@@ -1,0 +1,101 @@
+{% extends "site.html" %}
+{% block govde %}home{% endblock %}
+{% block icerik %}
+<section class="sh-root" id="ust" aria-label="AST Digital">
+  <div class="sh-glow" aria-hidden="true"></div>
+  <div class="sh-grid" aria-hidden="true"></div>
+  <div class="sh-stage" id="shStage" aria-hidden="true">
+    <img class="sh-fallback" id="shFallback" src="/static/hero-logo.png" alt="" draggable="false">
+  </div>
+  <div class="sh-grain" aria-hidden="true"></div>
+  <span class="sr-only">Yıldız-A sembolü ve AST DIGITAL yazısından oluşan logo, parçacıklardan oluşuyor.</span>
+  <div class="sh-navspace" id="shNav"></div>
+  <div class="sh-hint" id="shHint" aria-hidden="true">İmleci logonun üzerinde gezdir</div>
+  <div class="sh-spacer"></div>
+  <div class="sh-content" id="shContent">
+    <p class="sh-eyebrow">Etsy satıcıları için araçlar ve birebir danışmanlık</p>
+    <h1 class="sh-h1">Rastgele değil, <span class="sh-accent">AST gele gele.</span></h1>
+    <p class="sh-body">Başlık, etiket ve mockup işlerini dakikalara indiren araçlar; takıldığın yerde WhatsApp’tan birebir destek. Tek üyelikte.</p>
+    <div class="sh-ctas">
+      <a class="sh-btn" href="{{ url_for('sayfalar.basvuru') }}">Ücretsiz başla</a>
+      <button class="sh-ghost" type="button" data-chat>Asistana sor</button>
+    </div>
+    <ul class="sh-meta" aria-label="Öne çıkanlar">
+      <li>Ücretsiz plan</li><li>Premium 39 $ / ay</li><li>Mesai saatlerinde birebir destek</li>
+    </ul>
+  </div>
+  <a class="sh-scroll" href="#sorun" aria-label="Aşağı kaydır"><span></span></a>
+</section>
+
+<section id="sorun">
+  <div class="wrap">
+    <div class="sec-head"><h2>Satıcılar ürünlerinde değil, Etsy’nin kurallarında kayboluyor.</h2></div>
+    <div class="facts">
+      <div class="fact"><b>140</b><h3>karakterlik başlık</h3><p>Hangi kelimelerin arandığı deneme yanılmayla öğreniliyor.</p></div>
+      <div class="fact"><b>13</b><h3>etiket hakkı</h3><p>Yanlış etiket, ürünü kimsenin aramadığı yere koyuyor.</p></div>
+      <div class="fact"><b>1</b><h3>yasaklı kelime</h3><p>“Official” gibi tek bir ifade listing’i kaldırtabiliyor.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="kesfet">
+  <div class="wrap">
+    <div class="sec-head"><h2>Neye ihtiyacın varsa oradan başla.</h2></div>
+    <div class="explore">
+      <a href="{{ url_for('sayfalar.araclar') }}"><h3>Araçlar</h3><span>İncele</span><p>Listing Üretici, Mockup Stüdyosu, Pinterest pinleri ve SmartLead AI asistanı.</p></a>
+      <a href="{{ url_for('sayfalar.paketler') }}"><h3>Paketler</h3><span>Karşılaştır</span><p>Freemium ücretsiz. Premium aylık 39 $, ilk 7 gün ücretsiz.</p></a>
+      <a href="{{ url_for('sayfalar.nasil_calisir') }}"><h3>Nasıl çalışır</h3><span>Adımlar</span><p>Başvurursun, aynı gün onaylarız, araçları kullanmaya başlarsın.</p></a>
+      <a href="{{ url_for('sayfalar.hakkimizda') }}"><h3>Hakkımızda</h3><span>Hikâyemiz</span><p>Etsy’de defalarca baştan başlamış bir satıcının kurduğu marka.</p></a>
+    </div>
+  </div>
+</section>
+<section class="cta-band">
+  <div class="wrap">
+    <div><h2>Mağazanı birlikte büyütelim.</h2><p>Ücretsiz planla başla. Başvurunu aynı gün inceleyip e-postayla dönüş yaparız.</p></div>
+    <div class="row"><a class="btn btn-primary" href="{{ url_for('sayfalar.basvuru') }}">Başvur</a><a class="btn btn-ghost" href="{{ url_for('sayfalar.sss') }}">Sık sorulanlar</a></div>
+  </div>
+</section>
+{% endblock %}
+{% block betik %}
+<script src="/static/liquid-hero.js"></script>
+<script>
+(function(){
+  const root=document.getElementById('ust'), stage=document.getElementById('shStage'), img=document.getElementById('shFallback');
+  const nav=document.getElementById('shNav'), content=document.getElementById('shContent'), hint=document.getElementById('shHint');
+  let aspect=2400/1557, engine=null;
+  const coarse=matchMedia('(hover: none), (pointer: coarse)').matches;
+  if(coarse) hint.textContent='Logoya dokun';
+  function relayout(){
+    const w=root.clientWidth,h=root.clientHeight;
+    const band={top:document.getElementById('siteNav').offsetHeight-4,bottom:content.offsetTop-12};
+    const rect=computeRect(w,h,aspect,band,{scale:0.64,mobileScale:0.8,x:0,y:0});
+    Object.assign(img.style,{left:rect.x+'px',top:rect.y+'px',width:rect.w+'px',height:rect.h+'px'});
+    hint.style.left=clampN(rect.x+rect.w/2,80,w-80)+'px';
+    hint.style.top=Math.min(rect.y+rect.h+18,band.bottom-20)+'px';
+    if(engine) engine.resize(w,h,rect);
+  }
+  const rm=matchMedia('(prefers-reduced-motion: reduce)');
+  const canvas=document.createElement('canvas'); canvas.className='sh-canvas'; stage.appendChild(canvas);
+  try{
+    engine=new LiquidEngine(canvas,{interactive:true,strength:1,radius:200,density:1,dotSize:1,spread:1,turbulence:1,returnSpeed:1,
+      streaks:true,restStyle:'particles',ambient:true,ambientIntensity:0.7,speed:1,intro:true,reducedMotion:rm.matches,
+      bg:hexToRgb('#0F1B33',[0.04,0.08,0.15]),imgBg:null,liquid:1},()=>{root.dataset.gl='off';});
+  }catch(e){root.dataset.gl='off';}
+  new ResizeObserver(relayout).observe(root); new ResizeObserver(relayout).observe(content);
+  new IntersectionObserver(es=>es.forEach(e=>engine&&engine.setVisible(e.isIntersecting&&!document.hidden))).observe(root);
+  document.addEventListener('visibilitychange',()=>engine&&engine.setVisible(!document.hidden));
+  const pos=e=>{const b=root.getBoundingClientRect();return [e.clientX-b.left,e.clientY-b.top];};
+  let touched=false; const mark=()=>{if(!touched){touched=true;root.dataset.touched='1';}};
+  root.addEventListener('pointermove',e=>{const t=e.pointerType==='touch';if(t&&e.buttons===0&&e.pressure===0)return;const[x,y]=pos(e);engine&&engine.pointer('move',x,y,t);mark();},{passive:true});
+  root.addEventListener('pointerdown',e=>{const[x,y]=pos(e);engine&&engine.pointer('down',x,y,e.pointerType==='touch');mark();},{passive:true});
+  ['pointerup','pointercancel'].forEach(n=>root.addEventListener(n,e=>{const[x,y]=pos(e);engine&&engine.pointer('up',x,y,e.pointerType==='touch');},{passive:true}));
+  root.addEventListener('pointerleave',e=>{const[x,y]=pos(e);engine&&engine.pointer('leave',x,y,e.pointerType==='touch');},{passive:true});
+  const im=new Image(); im.decoding='async';
+  im.onload=()=>{aspect=im.naturalWidth/im.naturalHeight||aspect; relayout();
+    if(engine&&root.dataset.gl!=='off'){try{engine.onFirstFrame=()=>{root.dataset.gl='on';};engine.setImage(im);relayout();}catch(e){root.dataset.gl='off';}}};
+  im.src='/static/hero-logo.png';
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(relayout);
+  relayout();
+})();
+</script>
+{% endblock %}

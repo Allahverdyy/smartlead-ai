@@ -14,6 +14,9 @@ class Config:
     GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
     AI_PROVIDER = os.environ.get('AI_PROVIDER', 'groq')
     GROQ_MODEL = os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')
+    # Yedek sağlayıcı: Groq erişilemezse (veya AI_PROVIDER=gemini ise önce) Google Gemini denenir
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+    GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
 
     # Yönetim paneli anahtarı: tanımlıysa GET /api/leads bu anahtarı ister
     ADMIN_KEY = os.environ.get('ADMIN_KEY', '')

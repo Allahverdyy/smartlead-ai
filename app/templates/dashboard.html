@@ -16,6 +16,11 @@
   .ust h1 { font-family:Sora, sans-serif; font-size:20px; flex:1; }
   .ust h1 small { display:block; font:400 12px Inter; opacity:.65; margin-top:2px; }
   .anahtar { display:flex; gap:8px; }
+  .siteye { color:var(--krem); opacity:.75; font-size:13px; text-decoration:none; } .siteye:hover { opacity:1; }
+  .ikincil { background:transparent; border:1px solid #2b3a5c; color:var(--krem); }
+  .api { font-size:12px; display:flex; align-items:center; gap:6px; color:#9aa4b8; }
+  .api i { width:9px; height:9px; border-radius:50%; background:#9aa4b8; display:inline-block; }
+  .api.acik i { background:#3ccf7a; } .api.kapali i { background:var(--mercan); }
   .anahtar input { padding:9px 12px; border-radius:10px; border:1px solid #2b3a5c; background:var(--navy2); color:var(--krem); font:inherit; font-size:13px; width:230px; }
   button { background:var(--mercan); color:#fff; border:0; border-radius:10px; padding:9px 16px; font:600 13px Inter; cursor:pointer; }
 
@@ -75,9 +80,13 @@
 <div class="ust">
   <img src="{{ url_for('static', filename='ast-sembol.svg') }}" alt="AST Digital">
   <h1>Yönetim Paneli<small>SmartLead AI · potansiyel müşteriler ve sohbetleri</small></h1>
+  <a href="/" class="siteye">← Siteye dön</a>
+  <span class="api" id="api"><i></i>API kontrol ediliyor…</span>
   <div class="anahtar">
-    <input id="anahtar" type="password" placeholder="Yönetici anahtarı">
+    <input id="anahtar" type="hidden">
     <button id="yenile">Yenile</button>
+    <button id="csv" class="ikincil" title="Açık sekmedeki kayıtları indir">CSV indir</button>
+    <button id="cikis" class="ikincil" title="Yönetici oturumunu kapat">Çıkış</button>
   </div>
 </div>
 
@@ -209,6 +218,7 @@
     try {
       const [a, b] = await Promise.all([fetch('/api/leads', basliklar), fetch('/api/sohbetler', basliklar)]);
       const [va, vb] = await Promise.all([a.json(), b.json()]);
+      if (a.status === 401) { girisEkraninaDon(); return; }
       if (!va.basari) { durum.textContent = va.hata; return; }
       veriler = { leadler: va.leadler, sohbetler: vb.basari ? vb.sohbetler : [] };
       kpiGuncelle(); goster();
@@ -222,8 +232,39 @@
   }));
   document.getElementById('arama').addEventListener('input', goster);
   document.getElementById('yenile').addEventListener('click', yukle);
-  document.getElementById('anahtar').addEventListener('keydown', (e) => { if (e.key === 'Enter') yukle(); });
-  yukle();
+
+  // Açık sekmedeki (aramaya uyan) kayıtları Excel'in açabileceği CSV olarak indirir
+  document.getElementById('csv').addEventListener('click', () => {
+    const q = document.getElementById('arama').value.toLocaleLowerCase('tr').trim();
+    const ham = veriler[sekme];
+    const kayitlar = ham.map((r, i) => kayitBicimle(r, ham.length - i))
+      .filter(l => !q || [l.isim, l.telefon || '', l.eposta || '', l.mesaj || '', l.etsy || ''].join(' ').toLocaleLowerCase('tr').includes(q));
+    const hucre = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const satirlar = [['Ad', 'Telefon', 'E-posta', 'Etsy mağazası', 'Tarih', 'Lead mi', 'Sohbet']]
+      .concat(kayitlar.map(l => [l.isim, l.telefon, l.eposta, l.etsy, l.tarih, (sekme === 'leadler' || l.lead) ? 'Evet' : 'Hayır', l.mesaj]));
+    const csv = '\ufeff' + satirlar.map(s => s.map(hucre).join(';')).join('\r\n');   // BOM + ';' : Türkçe Excel doğru açar
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `smartlead-${sekme}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(a.href);
+  });
+
+  // Sunucu ayakta mı? (Render uykudaysa ilk istek ~1 dk sürebilir)
+  (async () => {
+    const api = document.getElementById('api');
+    try {
+      const v = await fetch('/health').then(r => r.json());
+      api.className = 'api ' + (v.durum === 'aktif' ? 'acik' : 'kapali');
+      api.lastChild.textContent = v.durum === 'aktif' ? 'API çalışıyor' : 'API yanıt vermiyor';
+    } catch { api.className = 'api kapali'; api.lastChild.textContent = 'API yanıt vermiyor'; }
+  })();
+  // Panel yalnızca sitedeki "Yönetim Paneli" girişinden açılır; anahtar o oturumda saklanır
+  function girisEkraninaDon() { try { sessionStorage.removeItem('ast_admin_key'); } catch (_) {} location.replace('/#yonetim'); }
+  document.getElementById('cikis').addEventListener('click', girisEkraninaDon);
+  let kayitliAnahtar = null;
+  try { kayitliAnahtar = sessionStorage.getItem('ast_admin_key'); } catch (_) {}
+  if (kayitliAnahtar === null) { girisEkraninaDon(); }
+  else { document.getElementById('anahtar').value = kayitliAnahtar; yukle(); }
 </script>
 </body>
 </html>

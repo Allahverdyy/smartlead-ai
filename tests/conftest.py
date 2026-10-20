@@ -15,6 +15,7 @@ def sinirlari_sifirla():
 def app(tmp_path, monkeypatch):
     """Her test için geçici bir veritabanıyla temiz bir uygulama. Gerçek smartlead.db'ye dokunmaz."""
     monkeypatch.setattr(ai_service, 'api_key', '')      # Groq'a gitme, demo modunda çalış
+    monkeypatch.setattr(ai_service, 'gemini_key', '')   # yedek sağlayıcı da kapalı
     return create_app('development', DATABASE_URL=str(tmp_path / 'test.db'), ADMIN_KEY='')
 
 

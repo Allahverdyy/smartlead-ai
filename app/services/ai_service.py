@@ -6,6 +6,7 @@ from config import Config
 
 GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 MODEL = Config.GROQ_MODEL
+GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
 
 # Groq ücretsiz plan: dakikada 8.000 token. Her istekte giden metni sınırlı tutuyoruz.
 GECMIS_SINIRI = 12             # geçmişten en fazla 12 mesaj (6 tur)
@@ -34,9 +35,50 @@ class AIServiceError(Exception):
 
 class AIService:
 
-    def __init__(self, api_key=None):
-        # api_key verilmezse .env'deki anahtar kullanılır (test için dışarıdan verilebilir)
+    def __init__(self, api_key=None, gemini_key=None, saglayici=None):
+        # Anahtarlar verilmezse .env'dekiler kullanılır (test için dışarıdan verilebilir)
         self.api_key = Config.GROQ_API_KEY if api_key is None else api_key
+        self.gemini_key = Config.GEMINI_API_KEY if gemini_key is None else gemini_key
+        self.saglayici = (saglayici or Config.AI_PROVIDER or 'groq').lower()
+
+    def _saglayici_sirasi(self):
+        """Anahtarı olan sağlayıcıları deneme sırasına dizer: seçilen önce, diğeri yedek."""
+        hepsi = [('groq', self.api_key, self._groq_istegi), ('gemini', self.gemini_key, self._gemini_istegi)]
+        if self.saglayici == 'gemini':
+            hepsi.reverse()
+        return [(ad, fonk) for ad, anahtar, fonk in hepsi if anahtar]
+
+    def _model_istegi(self, mesajlar):
+        """Sırayla sağlayıcıları dener; biri cevap verirse onu döndürür, hepsi düşerse son hatayı fırlatır."""
+        son_hata = AIServiceError('Asistan şu an yanıt veremiyor, lütfen biraz sonra tekrar deneyin.')
+        for ad, fonk in self._saglayici_sirasi():
+            try:
+                return fonk(mesajlar)
+            except AIServiceError as hata:
+                son_hata = hata          # yedek sağlayıcıya geç
+        raise son_hata
+
+    def _gemini_istegi(self, mesajlar):
+        """Aynı mesaj listesini Gemini biçimine çevirip istek atar (system → systemInstruction, assistant → model)."""
+        sistem = '\n\n'.join(m['content'] for m in mesajlar if m['role'] == 'system')
+        icerik = [{'role': 'model' if m['role'] == 'assistant' else 'user', 'parts': [{'text': m['content']}]}
+                  for m in mesajlar if m['role'] in ('user', 'assistant')]
+        try:
+            yanit = requests.post(
+                GEMINI_URL.format(model=Config.GEMINI_MODEL),
+                headers={'x-goog-api-key': self.gemini_key, 'Content-Type': 'application/json'},
+                json={'systemInstruction': {'parts': [{'text': sistem}]}, 'contents': icerik,
+                      'generationConfig': {'temperature': 0.6, 'maxOutputTokens': CEVAP_TOKEN_SINIRI}},
+                timeout=15
+            )
+        except requests.exceptions.RequestException:
+            raise AIServiceError('Yapay zekâ servisine bağlanılamadı.')
+        if yanit.status_code != 200:
+            raise AIServiceError('Asistan şu an yanıt veremiyor, lütfen biraz sonra tekrar deneyin.')
+        try:
+            return yanit.json()['candidates'][0]['content']['parts'][0]['text']
+        except (KeyError, IndexError, ValueError):
+            raise AIServiceError('Asistan şu an yanıt veremiyor, lütfen biraz sonra tekrar deneyin.')
 
     def _sistem_talimati(self):
         """Chatbot'un kim olduğunu ve nasıl davranacağını config'den okur."""
@@ -153,12 +195,12 @@ class AIService:
 
     def yanit_uret(self, mesaj, gecmis=None, iletisim_alindi=False, isim=None):
         """Dışarıya açık tek metot: kullanıcı mesajına cevap üretir."""
-        if not self.api_key:
+        if not self._saglayici_sirasi():
             if iletisim_alindi:
                 return 'Teşekkürler, bilgilerinizi aldım; ekibimiz mesai saatlerinde sizi arayacak.'
             return ('Şu an demo modundayım. Sorunuzu iletmek için başvuru formunu '
                     'doldurabilir veya digital.ast.tr@gmail.com adresine yazabilirsiniz.')
-        cevap = self._temizle(self._groq_istegi(self._mesajlari_hazirla(mesaj, gecmis, iletisim_alindi, isim)))
+        cevap = self._temizle(self._model_istegi(self._mesajlari_hazirla(mesaj, gecmis, iletisim_alindi, isim)))
         cevap = self._sahte_formu_temizle(cevap)
 
         # Kod kapıları: kritik kurallar modelin iyi niyetine bırakılmaz

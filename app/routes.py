@@ -31,6 +31,50 @@ api = Blueprint('api', __name__, url_prefix='/api')
 
 @sayfalar.route('/')
 def ana_sayfa():
+    """AST Digital sitesi (yerel prototip): sohbet /widget, form /api/leads, panel /dashboard."""
+    return render_template('sayfalar/anasayfa.html', aktif='ana_sayfa')
+
+
+# Sitenin iç sayfaları: hepsi site.html'deki ortak üst menüyü ve alt bilgiyi kullanır
+@sayfalar.route('/araclar')
+def araclar():
+    return render_template('sayfalar/araclar.html', aktif='araclar')
+
+
+@sayfalar.route('/nasil-calisir')
+def nasil_calisir():
+    return render_template('sayfalar/nasil.html', aktif='nasil_calisir')
+
+
+@sayfalar.route('/paketler')
+def paketler():
+    return render_template('sayfalar/paketler.html', aktif='paketler')
+
+
+@sayfalar.route('/hakkimizda')
+def hakkimizda():
+    return render_template('sayfalar/hakkimizda.html', aktif='hakkimizda')
+
+
+@sayfalar.route('/sss')
+def sss():
+    return render_template('sayfalar/sss.html', aktif='sss')
+
+
+@sayfalar.route('/basvuru')
+def basvuru():
+    return render_template('sayfalar/basvuru.html', aktif='basvuru')
+
+
+@sayfalar.route('/iletisim')
+def iletisim():
+    """Genel iletişim: sade form (başvuru sayfasından ayrı)."""
+    return render_template('sayfalar/iletisim.html', aktif='iletisim')
+
+
+@sayfalar.route('/asistan')
+def asistan():
+    """Sohbet asistanı tam sayfa."""
     return render_template('index.html')
 
 

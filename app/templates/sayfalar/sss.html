@@ -1,0 +1,26 @@
+{% extends "site.html" %}
+{% block baslik %}SSS · AST Digital{% endblock %}
+{% block icerik %}
+<section class="page-hero">
+  <div class="wrap">
+    <h1>Sık sorulanlar</h1>
+    <p>Cevabını bulamazsan sağ alttaki asistana sor ya da bize yaz.</p>
+  </div>
+</section>
+<section id="sss">
+  <div class="wrap">
+    <div class="faq">
+      <details open><summary>Satış garantisi veriyor musunuz?</summary><p>Hayır. Etsy’de satış birçok etkene bağlıdır. Biz doğru yöntemi ve araçları veriyoruz; satış garantisi vermiyoruz.</p></details>
+      <details><summary>İngilizcem zayıf, kullanabilir miyim?</summary><p>Evet. Panel ve destek Türkçe; araçlar Etsy alıcıları için başlık ve etiketleri İngilizce üretir.</p></details>
+      <details><summary>Birebir danışmanlık nasıl oluyor?</summary><p>Premium üyeler mesai saatlerinde WhatsApp hattından yazar; ekran görüntüsüyle mağazanı birlikte inceleriz.</p></details>
+      <details><summary>Verilerim ne oluyor?</summary><p>Başvuru ve sohbet verileri yalnızca hizmet için kullanılır, KVKK aydınlatma metnine göre saklanır; istediğinde sildirebilirsin.</p></details>
+    </div>
+  </div>
+</section>
+<section class="cta-band">
+  <div class="wrap">
+    <div><h2>Hazırsan başlayalım.</h2><p>Ücretsiz planla başla. Başvurunu aynı gün inceleyip e-postayla dönüş yaparız.</p></div>
+    <div class="row"><a class="btn btn-primary" href="{{ url_for('sayfalar.basvuru') }}">Başvur</a><button class="btn btn-ghost" type="button" data-chat>Asistana sor</button></div>
+  </div>
+</section>
+{% endblock %}

@@ -283,3 +283,27 @@ def test_kvkk_onaysiz_sohbetteki_telefon_kaydedilmez(client):
 def test_kvkk_sayfasi_acilir(client):
     yanit = client.get('/kvkk')
     assert yanit.status_code == 200 and 'Aydınlatma' in yanit.get_data(as_text=True)
+
+
+def test_site_ve_asistan_sayfalari(client):
+    """Ana sayfa AST Digital sitesi; sohbet /widget iframe'i, tam sayfa asistan /asistan adresinde."""
+    site = client.get('/')
+    assert site.status_code == 200
+    html = site.get_data(as_text=True)
+    assert 'AST gele gele' in html and '/widget' in html and '/api/leads' in html
+    assert client.get('/asistan').status_code == 200
+
+
+def test_site_ic_sayfalari(client):
+    """Her bölüm kendi adresinde açılır; hepsinde aynı sabit üst menü ve aktif link işareti var."""
+    adresler = {'/araclar': 'Listing Üretici', '/nasil-calisir': 'Onay al', '/paketler': 'Premium',
+                '/hakkimizda': 'Abdulsamed', '/sss': 'Satış garantisi', '/basvuru': 'id="form"',
+                '/iletisim': 'id="iletisimForm"'}
+    for adres, metin in adresler.items():
+        cevap = client.get(adres)
+        assert cevap.status_code == 200, adres
+        html = cevap.get_data(as_text=True)
+        assert metin in html, adres
+        assert 'id="siteNav"' in html and 'aria-current="page"' in html, adres
+    ana = client.get('/').get_data(as_text=True)
+    assert 'id="siteNav"' in ana and 'href="/basvuru"' in ana and 'href="/paketler"' in ana

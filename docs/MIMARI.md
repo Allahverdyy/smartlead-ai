@@ -194,6 +194,7 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 - Anahtar yoksa çökmek yerine **"demo modu"** mesajı döndürür.
 - Servise özel hata sınıfı `AIServiceError`; istek `try-except` ile sarılır, hata olursa `AIServiceError` fırlatılır.
 - Dosya sonunda tek örnek: `ai_service = AIService()`.
+- **Yedek sağlayıcı (16 Ekim):** Salih Bey'in örnek kodundaki çoklu sağlayıcı yaklaşımı uyarlandı. Groq hata verirse aynı mesajlar Gemini biçimine çevrilip (`system` → `systemInstruction`, `assistant` → `model`) Google Gemini'ye gönderilir. `AI_PROVIDER=gemini` sırayı tersine çevirir. Yedek, `GEMINI_API_KEY` (ve isteğe bağlı `GEMINI_MODEL`) ortam değişkeni eklenince devreye girer; anahtar yoksa yalnız Groq kullanılır.
 - Bu dosya Flask, HTTP veya veritabanı kavramlarını bilmez; sağlayıcı değişikliği (Groq → Gemini) yalnızca burayı etkiler.
 - ✅ 11 Ekim: tamamlandı. `test_modul_c.py` ile 4 test: gerçek soru, konuşma geçmişini hatırlama, anahtarsız demo modu, yanlış anahtarda `AIServiceError` (401) yakalama.
 - **Test sırasında bulunan sorun ve çözümü:** İlk sürümde model olmayan bir üyelik linki uydurdu, pakette olmayan hizmetler (stok yönetimi, otomatik fiyat güncelleme) vaat etti ve Markdown kullandı. Çözüm: `BUSINESS_CONTEXT`'e gerçek paket içerikleri, izin verilen tek link/e-posta ve kurallar (uydurma yok, satış garantisi yok, düz metin, kısa cevap) eklendi; ayrıca cevaplar `_temizle()` ile Markdown yıldızlarından arındırılıyor (talimata güvenmek yerine kodda garanti).
@@ -218,7 +219,8 @@ Kod öğrenci tarafından yazılacaktır; aşağıdakiler her modülün **ne iç
 
 ## Modül F — Testler
 
-- **16 Ekim güncel: 56 test.** Yeni testler: sohbet kaydı ve oturum, sohbete yazılan telefonla otomatik lead, e-posta ile telefonsuz lead, aynı oturumda tek lead, ziyaretçinin sohbetini silmesi, KVKK onayı (onaysız lead 400, onaysız sohbetteki telefon kaydedilmez), sahte form satırı temizliği, önbellek başlığı.
+- **16 Ekim güncel: 61 test.** Son eklenenler: Groq düşünce Gemini'ye geçiş, Gemini mesaj biçimi, sağlayıcı sırası (AI_PROVIDER).
+- 56 test aşaması: Yeni testler: sohbet kaydı ve oturum, sohbete yazılan telefonla otomatik lead, e-posta ile telefonsuz lead, aynı oturumda tek lead, ziyaretçinin sohbetini silmesi, KVKK onayı (onaysız lead 400, onaysız sohbetteki telefon kaydedilmez), sahte form satırı temizliği, önbellek başlığı.
 - `python -m pytest -v` → **30 test** (11 Ekim), Groq'a bağlanmadan ve gerçek veritabanına dokunmadan (her test geçici `test.db` kullanır) ~1 saniyede çalışır.
 - `tests/test_api.py` (16): `/health`, sayfalar, `/api/sohbet` (400 / 200 demo / 503), `/api/leads` (201, telefon standardı, geçersiz isim/telefon/mağaza → 400, SQL enjeksiyonu, sıralama), `ADMIN_KEY` (401/200), CORS (Wix izinli, başka site engelli).
 - `tests/test_ai_service.py` (6): demo modu, mesaj sırası ve 10 mesaj sınırı, sahte `system` mesajının sızmaması, Markdown temizliği, ikinci örneği durduran kod kapısı.
@@ -350,7 +352,7 @@ Kurallar:
 2. **IP sınırı çalışır:** İstek ziyaretçinin tarayıcısından gelir. `wix-fetch` backend'den gitseydi tüm ziyaretçiler Wix'in IP'sinden geliyormuş gibi görünür, istek sınırı anlamsızlaşırdı.
 3. **Daha zengin deneyim:** "yazıyor…" animasyonu, giriş ekranı, kalıcı sohbet geçmişi ("Sohbetlerim"), sohbet silme — Wix bileşenleriyle kodla oluşturulamaz.
 
-**Yönetim Paneli Wix'te ve Velo ile:** Anahtar (`ADMIN_KEY`) **Wix Secrets Manager**'da (`SMARTLEAD_ADMIN_KEY`) durur, tarayıcıya hiç inmez. Web modülü `Permissions.Admin` ile korunur: yalnızca site yöneticisi veri alabilir. Render uykudaysa sayfa sunucuyu uyandırıp 15 sn arayla 4 kez dener. Sohbet metni `$item('#txtSohbet').html` ile basılır; kullanıcı metni önce HTML'den kaçırılır (XSS). Yedek panel: `https://smartlead-ai-dse5.onrender.com/dashboard`.
+**Yönetim Paneli Wix'te ve Velo ile:** Anahtar (`ADMIN_KEY`) **Wix Secrets Manager**'da (`SMARTLEAD_ADMIN_KEY`) durur, tarayıcıya hiç inmez. Web modülü `Permissions.Admin` ile korunur: yalnızca site yöneticisi veri alabilir. Render uykudaysa sayfa sunucuyu uyandırıp 15 sn arayla 4 kez dener. Sohbet metni `$item('#txtSohbet').html` ile basılır; kullanıcı metni önce HTML'den kaçırılır (XSS). Yedek panel: `https://smartlead-ai-dse5.onrender.com/dashboard` (CSV indirme ve API durum göstergesi bu panelde).
 
 **Ziyaretçi akışı:** Giriş ekranı (ad soyad + e-posta + **KVKK onay kutusu**, isteğe bağlı "Bilgi vermeden devam et") → sohbet → sohbet tarayıcıda saklanır, site kapansa da devam eder → "Sohbetlerim"den eski sohbetler açılır veya silinir (sunucudan da silinir; bırakılan iletişim bilgisi kalır).
 
@@ -380,7 +382,7 @@ Kurallar:
 | Veritabanı | Modül B | ✅ 11 Ekim |
 | Yapay zekâ servisi | Modül C | ✅ 11 Ekim |
 | Rotalar · Fabrika + giriş | Modül D–E | ✅ 11 Ekim |
-| Çalıştırma + test | Modül F | ✅ 16 Ekim — `pytest`: 56 otomatik test |
+| Çalıştırma + test | Modül F | ✅ 16 Ekim — `pytest`: 61 otomatik test |
 | Chatbot ince ayarı | — | ⚠️ Açık maddeler var (yukarıda) |
 | Wix Karşılama (asistan popup, tüm sayfalar) | Modül G | ✅ 16 Ekim |
 | Wix Yönetim Paneli (Velo + Repeater) | Modül G | 🟡 16 Ekim — kod hazır (`wix/`), Wix'e kurulum |

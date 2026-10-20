@@ -1,0 +1,74 @@
+{% extends "site.html" %}
+{% block baslik %}Başvuru · AST Digital{% endblock %}
+{% block icerik %}
+<section class="page-hero">
+  <div class="wrap">
+    <h1>Mağazanı birlikte büyütelim.</h1>
+    <p>Mağazanı ve hedeflerini anlat. Başvurunu inceleyip sana uygun planla aynı gün e-postayla dönüş yapalım.</p>
+  </div>
+</section>
+<section id="basvuru">
+  <div class="wrap basv">
+    <aside class="side-sticky">
+      <h2>Başvuru nasıl ilerler?</h2>
+      <ol class="flow">
+        <li><b>Formu doldur</b><span>Yaklaşık 3 dakika sürer. Zorunlu alanlar <em style="color:var(--accent);font-style:normal">*</em> ile işaretli.</span></li>
+        <li><b>İnceleme</b><span>Mağazana bakar, ihtiyacına en uygun paketi belirleriz.</span></li>
+        <li><b>Dönüş</b><span>Aynı gün e-postayla, istersen WhatsApp’tan yazarız.</span></li>
+      </ol>
+      <div class="note-box"><b>Genel bir sorun mu var?</b> Başvuru yapmadan soru sormak için <a href="{{ url_for('sayfalar.iletisim') }}">iletişim sayfasını</a> kullan.</div>
+    </aside>
+
+    <form id="form" novalidate>
+      <div class="fs" role="group" aria-labelledby="fs1">
+        <h3 class="fs-t" id="fs1"><i>01</i>Seni tanıyalım</h3>
+        <label>Ad soyad <em>*</em><input id="f-ad" required autocomplete="name" placeholder="Adın ve soyadın"></label>
+        <label>E-posta <em>*</em><input id="f-mail" type="email" required autocomplete="email" placeholder="ornek@eposta.com"></label>
+        <label>WhatsApp / telefon<input id="f-tel" type="tel" autocomplete="tel" placeholder="+90 5__ ___ __ __"></label>
+        <label>Yaşadığın şehir<input id="f-sehir" autocomplete="address-level2" placeholder="Konya"></label>
+      </div>
+
+      <div class="fs" role="group" aria-labelledby="fs2">
+        <h3 class="fs-t" id="fs2"><i>02</i>Mağazan</h3>
+        <label class="full">Etsy mağaza linki <em>*</em><input id="f-etsy" required placeholder="https://www.etsy.com/shop/MagazaAdin"><span class="hint">Mağaza adını ya da tam linki yazabilirsin.</span></label>
+        <label>Web sitesi / diğer mağaza<input id="f-web" type="url" inputmode="url" placeholder="https://siteadresin.com"></label>
+        <label>Instagram / Pinterest<input id="f-sosyal" placeholder="@kullaniciadi"></label>
+        <label>Mağaza ne kadar süredir açık?
+          <select id="f-yas"><option value="">Seç</option><option>Henüz açmadım</option><option>0-6 ay</option><option>6-12 ay</option><option>1-3 yıl</option><option>3 yıldan fazla</option></select>
+        </label>
+        <label>Aktif ürün (listing) sayısı<input id="f-adet" type="number" min="0" inputmode="numeric" placeholder="Örn. 40"></label>
+        <label>Aylık ortalama satış
+          <select id="f-satis"><option value="">Seç</option><option>Henüz satış yok</option><option>1-10 adet</option><option>11-50 adet</option><option>50+ adet</option></select>
+        </label>
+        <label>Ürün kategorisi<input id="f-kategori" placeholder="Örn. dijital baskı, takı, ev dekorasyonu"></label>
+      </div>
+
+      <div class="fs" role="group" aria-labelledby="fs3">
+        <h3 class="fs-t" id="fs3"><i>03</i>İhtiyacın</h3>
+        <label>Paket
+          <select id="f-paket"><option>Freemium</option><option>Premium</option></select>
+        </label>
+        <label>Bizi nereden duydun?
+          <select id="f-duydu"><option value="">Seç</option><option>Instagram</option><option>LinkedIn</option><option>Etsy</option><option>Arkadaş / tavsiye</option><option>Google</option><option>Diğer</option></select>
+        </label>
+        <p class="fs-d">En çok zorlandığın alanları işaretle (birden fazla seçebilirsin).</p>
+        <div class="chips" id="f-zorluk">
+          <label><input type="checkbox" value="Başlık ve etiket (SEO)"> Başlık ve etiket (SEO)</label>
+          <label><input type="checkbox" value="Ürün açıklamaları"> Ürün açıklamaları</label>
+          <label><input type="checkbox" value="Görsel ve mockup"> Görsel ve mockup</label>
+          <label><input type="checkbox" value="Fiyatlandırma"> Fiyatlandırma</label>
+          <label><input type="checkbox" value="Trafik ve görünürlük"> Trafik ve görünürlük</label>
+          <label><input type="checkbox" value="Sosyal medya"> Sosyal medya</label>
+          <label><input type="checkbox" value="Zaman yönetimi"> Zaman yönetimi</label>
+        </div>
+        <label class="full">Hedefin ne?<textarea id="f-hedef" placeholder="Örn. 3 ay içinde ilk 50 satışı yapmak, listing sayımı ikiye katlamak…"></textarea></label>
+        <label class="full">Eklemek istediklerin<textarea id="f-msg" placeholder="Bize iletmek istediğin başka bir şey varsa yaz."></textarea></label>
+      </div>
+
+      <label class="kvkk"><input id="f-kvkk" type="checkbox"> <span><a href="/kvkk" target="_blank">KVKK aydınlatma metnini</a> okudum, 18 yaşından büyüğüm ve verilerimin başvuru için işlenmesini onaylıyorum.</span></label>
+      <button class="btn btn-primary" type="submit">Başvuruyu gönder</button>
+      <div class="form-msg" id="formMsg" hidden role="status"></div>
+    </form>
+  </div>
+</section>
+{% endblock %}

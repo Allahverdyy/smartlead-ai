@@ -1,0 +1,32 @@
+{% extends "site.html" %}
+{% block baslik %}Paketler · AST Digital{% endblock %}
+{% block icerik %}
+<section class="page-hero">
+  <div class="wrap">
+    <h1>İki paket, gizli ücret yok.</h1>
+    <p>Freemium’la araçları tanı. Düzenli satış ve birebir destek istiyorsan Premium’u 7 gün ücretsiz dene.</p>
+  </div>
+</section>
+<section id="paketler">
+  <div class="wrap">
+    <div class="plans">
+      <div class="plan">
+        <h3>Freemium</h3><div class="price">0 $ <small>/ ay</small></div><p class="sub">Araçları denemek ve ilk listing’lerini hazırlamak için.</p>
+        <ul><li>Günde 5 listing ve mockup</li><li>Ticket ile destek</li><li>Haftalık tanıtım yayını</li><li>SmartLead AI asistanı</li></ul>
+        <a class="btn btn-ghost" href="{{ url_for('sayfalar.basvuru', paket='Freemium') }}">Ücretsiz başvur</a>
+      </div>
+      <div class="plan dark band">
+        <h3>Premium</h3><div class="price">39 $ <small>/ ay · ≈ 1.950 TL</small></div><p class="sub">Düzenli satış hedefleyen ve birebir destek isteyen satıcılar için.</p>
+        <ul><li>Günde 20 listing ve mockup</li><li>Günde 5 otomatik Pinterest pini</li><li>Mesai saatlerinde WhatsApp’tan birebir danışmanlık</li><li>Haftalık soru-cevap yayını</li><li>7 gün ücretsiz deneme</li></ul>
+        <a class="btn btn-primary" href="{{ url_for('sayfalar.basvuru', paket='Premium') }}">Premium’a başvur</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="cta-band">
+  <div class="wrap">
+    <div><h2>Hazırsan başlayalım.</h2><p>Ücretsiz planla başla. Başvurunu aynı gün inceleyip e-postayla dönüş yaparız.</p></div>
+    <div class="row"><a class="btn btn-primary" href="{{ url_for('sayfalar.basvuru') }}">Başvur</a><button class="btn btn-ghost" type="button" data-chat>Asistana sor</button></div>
+  </div>
+</section>
+{% endblock %}

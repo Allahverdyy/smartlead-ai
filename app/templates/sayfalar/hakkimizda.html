@@ -1,0 +1,60 @@
+{% extends "site.html" %}
+{% block baslik %}Hakkımızda · AST Digital{% endblock %}
+{% block icerik %}
+<section class="page-hero">
+  <div class="wrap">
+    <h1>Defalarca baştan başlamış bir satıcıdan doğdu.</h1>
+    <p>AST Digital, Etsy’de aynı yoldan geçen satıcılara araç ve tecrübe sunmak için kuruldu.</p>
+  </div>
+</section>
+<section id="hakkimizda">
+  <div class="wrap about">
+    <div class="quote band"><svg viewBox="15 15 471 467" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"> <path d="M139.924 223.229L139.946 223.245H139.947L158.48 236.71L162.856 223.245H162.857L158.481 236.711L334.222 364.396L292.809 236.932L334.226 364.398L295.45 245.061H364.266L427.591 439.955L427.587 439.956L377.237 476.537L377.233 476.543L192.887 342.606L154.688 460.18L154.687 460.179L192.887 342.606L137.216 302.159L130.127 323.974L185.799 364.422L154.686 460.18L92.4434 439.955L137.215 302.158L20 216.996L39.2334 190.521V190.521L20 216.995L39.2334 157.799V157.798H161.184L139.924 223.229ZM260.017 30.1133L291.139 20L328.824 135.982H260.024L231.67 223.245H177.061L165.569 214.896L228.896 20L260.017 30.1133ZM480.8 223.245H254.61L275.875 157.798H480.8V223.245ZM260.017 30.1123L228.896 20H291.138L260.017 30.1123Z" class="mercan"/> </svg><p>Rastgele değil,<br><b>AST gele gele.</b></p></div>
+    <div class="about-text">
+      <p>AST Digital’in kurucusu Abdulsamed Tanrıverdi, bilgisayar programcılığı eğitiminin ardından Etsy’de mağaza açtı. İlk mağazalar satış görmedi, bazıları kapandı, her seferinde baştan başladı.</p>
+      <p>Her denemede bir şey öğrendi: hangi başlığın aranmadığını, hangi görselin tıklanmadığını, hangi fiyatın satmadığını. Yazılımcı olduğu için en çok vakit kaybettiren işleri zamanla kendi yazdığı araçlara devretti. Bugün aynı yoldan geçen satıcılara hem bu araçları hem o yolu kısaltan tecrübeyi sunuyor.</p>
+    </div>
+  </div>
+</section>
+<section class="alt" id="vizyon-misyon">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Yön ve amaç</span>
+      <h2>Nereye gidiyoruz, nasıl yürüyoruz.</h2>
+      <p>Her kararımızı iki soruya bağlarız: satıcının zamanını nereye harcatmak istiyoruz, ve bunu nasıl ölçülebilir kılarız.</p>
+    </div>
+    <div class="vm">
+      <article class="vm-card dark">
+        <span class="eyebrow">Vizyonumuz</span>
+        <h3>Türkiye’den çıkan, dünya pazarında rekabet eden e-ticaret satıcılarının en güvenilir dijital ortağı olmak.</h3>
+        <p>Etsy ile başladığımız yolu Amazon, Shopify ve diğer platformlara taşıyarak, yapay zekâ destekli araçları ve gerçek satıcı tecrübesini tek çatı altında sunan bir e-ticaret uzmanlığı markası kurmayı hedefliyoruz.</p>
+      </article>
+      <article class="vm-card light">
+        <span class="eyebrow">Misyonumuz</span>
+        <h3>Satıcıların tekrar eden işlerini otomatikleştirip, vaktini ürüne ve müşteriye geri vermek.</h3>
+        <p>Listeleme, SEO, görsel ve içerik süreçlerini sade, anlaşılır ve ölçülebilir araçlara dönüştürüyoruz. Satıcının denemelerle yıllarını harcamadan doğru yolu bulmasını sağlıyor, her adımda şeffaf ve KVKK’ya uygun çalışıyoruz.</p>
+      </article>
+    </div>
+  </div>
+</section>
+<section id="degerler">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Değerlerimiz</span>
+      <h2>Çalışma biçimimizi belirleyen dört ilke.</h2>
+    </div>
+    <div class="values">
+      <div class="value"><h3>Yaşanmışlık</h3><p>Önerdiğimiz her yöntemi önce kendi mağazalarımızda denemiş oluruz. Teori değil, sonuç paylaşırız.</p></div>
+      <div class="value"><h3>Sadelik</h3><p>Karmaşık panel ve jargon yerine, ilk günden anlaşılan araçlar ve net sonuçlar sunarız.</p></div>
+      <div class="value"><h3>Şeffaflık</h3><p>Ne yaptığımızı, neyi neden önerdiğimizi ve neyi garanti edemeyeceğimizi açıkça söyleriz.</p></div>
+      <div class="value"><h3>Veri sorumluluğu</h3><p>Satıcı verisini KVKK çerçevesinde, yalnızca hizmeti sunmak için kullanırız.</p></div>
+    </div>
+  </div>
+</section>
+<section class="cta-band">
+  <div class="wrap">
+    <div><h2>Hazırsan başlayalım.</h2><p>Ücretsiz planla başla. Başvurunu aynı gün inceleyip e-postayla dönüş yaparız.</p></div>
+    <div class="row"><a class="btn btn-primary" href="{{ url_for('sayfalar.basvuru') }}">Başvur</a><button class="btn btn-ghost" type="button" data-chat>Asistana sor</button></div>
+  </div>
+</section>
+{% endblock %}

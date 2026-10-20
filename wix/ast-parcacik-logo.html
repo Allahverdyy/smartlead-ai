@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AST Digital · Parçacık Logo</title>
+<!--
+  AST Digital — sıvı parçacık logo (Wix "Embed HTML" için, arka plansız)
+  Efekt: "Sculpture Hero" (guglielmogiannattasio.it) bileşeninin düz JavaScript uyarlaması.
+  Ayarlar aşağıdaki AYARLAR nesnesinde.
+-->
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;background:transparent;overflow:hidden}
+  #ast-fx{position:fixed;inset:0;touch-action:pan-y;-webkit-tap-highlight-color:transparent}
+  #ast-fx canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1s ease}
+  #ast-fx img{position:absolute;max-width:none;user-select:none;-webkit-user-drag:none;transition:opacity .8s ease}
+  #ast-fx[data-gl="on"] canvas{opacity:1}
+  #ast-fx[data-gl="on"] img{opacity:0}
+</style>
+</head>
+<body>
+<div id="ast-fx" role="img" aria-label="AST Digital logosu">
+  <img id="ast-fallback" alt="" draggable="false" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABEwAAALKCAMAAAAf5jR3AAAAwFBMVEXw4tX/Y2P68eH/UwTn0qn58OH/AP/XsLD37eD/AH8AAP//cEz/f///qv8A/wBVVVV/f/+//7//cU0AAADx6Nr/a0r99eX+/v7x6Nn/cU7/VVT/AAD//7nx6dry6Nnu59Xx5tj/a0nx6Nl/f3/y6dr/f3//akn/aUn/akn/akn/aUn/akm+vr7/fj7//wD/ZjP/fwD/v7//Pz/47uD/qqqqqqrv2dL//3/7+9T45uT/c0z/qlXMy8v/WzvX19TY2LeXdP1EAAAAQHRSTlMZBdcDB6sBBk4CAdACAwEDAgRjAP7+/gKu/gMBA5NQEyzPbQLQAoosr20TTwQEAQUCBAT8AwMOAgoOEAMFCAcIj9ehhwAARpVJREFUeNrtnQmfqkiy9k9P98zc5d1TSQUEtKAWt7K01FrOOf39v9VL4lJggYIG5MLz3N+de6e7T4uY+SeeiCDyB4MgCCLQD9wCCIIAk3JyosWtihwsFQgCTCAIAkxINH64XR8MsQkEtRwmNrvvd29V/5Et2rlAOI84f3V5rOn05cXVQ5xnvoILNXG/jYeJM/8Y3g6TbnfM5u1iyF543kKITI6ByUOXQhPHbglE4sdM9PUXfvp+EASe541Go8FOPfX1T48dMMiZ14PqVsDWLYDJksLlJD4nMp0iU/cYh/CYIF4Mj14Yhp1Ox9JOHpseYdKzoPrv94v5MHEce0gSmcQ+x9QULN9+5Rh8wZCeIMhhmaw6Oso/RCacvXWgutUOmERELkf4nJmJ9+f1hR9iEW/UiyGyShCi+druHV3OlHkWNjtgQqEZe+qTsKR/zwxLmjiH/Cr342hkH4uYsraPoZYbuxxsdsCEZMewYb8Ln5OTInnd2Zr/EOHIyhiM7PX25XJ8bHXARDGXY1A9J5q6yT4LvDgesUzjSNblcLgcwEQ1l2OKz+Gvu20WiIDEQI7sl/a/0rUc7HXAhEJzOpfTHWrvc/Y5En8fkZi7tjeHOj5cDmBCpT8JXU7sc7QOTXYkeQ9GhoMk43JcDpcDmFB1rJG5HL19TpSQZLMLSYxf2SOxsve1nAFgApiQaOE80sGkO/xwHH1jksDrmR6SHOSz7ZfLWWGrAyaK1XKEHjQMTXYk8Ue9jtWSZ3S6ljOHywFMaGRTuhwtfQ5/SRKu7SHJzuVwuBzAhDwyoXQ5sc+xtarnJEHJ396gTSQRCo4wYe8hYAKY0LBk3O221ufsEiWjsGUkQccaYKJ8LWfvc3R52U9ME9i0y958uZyvjjW4HMBETZcT+5yZFvWcXVAyCK1WbqWjy4ltHlwOYELU/UrtcoTPUX9EEhcPZhGUtLIoaoVHl7NmAbY5YEKimTMhDky6/afYO6mtrfA3o3DV1kdyyuVM4XIAE6qONXKXE/ucudo2Rxgcf9RSf3PqctgGLgcwIZFTg8tR3OcIlASDTptRYoXHsUivcDmAibouJ/E5M9VR0u5VPUoNbITLAUxUreUImAxVLedwFyg5cTmo5QAmKrscVX0OopIvl3OECVwOYELUsVaHy1G0niPewPGBErGoB8w9dqyNcEMAE3VdjvA56r2es2bs9wgo2buc12OwBpcDmCjbsaamz4nD+p8j7Ju9yzmOpUfHGmBCJZtN6mFJ7HNstVDCvFb3lZy4nK+ONbgcwIQKJvf9emCi1KHDIu/ag8M5aJVyOQzRGmBCVcsZ1mRzumO2UORb3nH2A8mStMvx56jlACa6uByV+tamicPBSk67HA6XA5hQF4brcjmJz1EiMok483tIlmRcjicqW7ugDYdvASZULuejNpfT7X6oQJP4EQyHc+py3r/uzg/cD8BEdZcThyYTR3rfWvTKAjx6v7scdKwBJtrUchSp5yAsKVjRX9NfgVrAhMjl2DW6HFHPkdoFy19FtgQr+DRj0nk/wOT/sHfcD8CEKDB5qJMlsc+ZyQ1LPIQlZ10OajmAiQa1HPn1HJf9G3M68hc0h8sBTOhDk1pdjkyfw10WoLckX/7B5dwxH3cDMNHB5cis5yDzWryee1+t9DhiGDAh0qxel5P4HDkv+70wHxancD07cDmACXkxJ6rZ5Yi+NRk+ZwqLc0bvqYGNuBuAiR4uJ9ZEQmjCOfNWYEmxyznUclwOlwOYUNVynvo1s6R/3zxMRLpkhWV7ZjnD5QAm5C7HHva7xvmcV/Y30iXnazl3B5aglgOYEL220oDLad7ncLbB4/a8yzkGJnA5gAlZyuSp/sCkaZ/DkXot7XJcuBzAhMjkOLwBl9MdNtq3FrMEqdfStRy/g9wSYKKPy2nW57wwb4X9UdblMLgcwISqY60Bl5P4nKZe9uN4be3yYh4dx9JzHDEMmBBp7jw2AZPusKl6Dsegn1K1HLgcwIRYi4ZcTmOHcYElcDmAiSSX4zTichqr5/A1ovZSLucFLgcwoXY5rBmXE/uczwZ8Dn/F3iijIOVyUEMHTIhczrjbbczn2A14HLCkxFIOU00mOHwLMNHM5TTjc1zkS0q6HH6sooO+gAlVl0lTLif2OXbdNge51+ouZwOXA5jQtL826HLqr+eAJWVdTmr4K1wOYELlciaNBSbi0OFlvSxBkRO1HMCkDS4n9jlzByxRyuXEdw0uBzAhqgt/dLuG+ByUJaq4nD1MXnHTABMi2axBl5P4HLu+uAT9EuVdzuG9nClcDmBCBpPHRmEyjHhtDSZgSQWXczzjAi4HMKGq5TTrcoTPqedoPz7FgJ/yLuft4HLWcDmACZ3LaZYlsc+pZw4BmtUqrOPBMf2KWQ2ACZU+6z58K+/Q4ToKOijkVHM568N928LlACZa1nJq8znovKrmcnDfABPtXY7wOQ69z0Hy9UqXg45hwERbl5P4HF5DYILkayWXw48ti7hxgAnVeznDxm1Ol35IvbpZxJWloDqblMux9BfZ9m5WhsFEgsupw+coVt7cr5XdVNUwUU8l/XOUHtjY019UP1zDl530+pgEk8Zdzq6eQ+txXn+rkTDZPyZjdgwGI88LgsD3OYPqFo1TswYyrt0YmMhxOcLnzGlNjvSG8FUSicQQGcUI8U+Tw0J36ohnAKfSlV2l9R0VTLa/G/0Z5kbB5LOxsfTZ0GRC6nNkmxwRjcQY8QL/7/0Vbdcu59OYIFuOwKR2cbrIRMKvZRBMJLicxOcQvuwnsyq8Eq4m4ci+CzcGyBoAAUzaBxOH/SHF5QifExGuJUkmJwlIRnuO3LkiDsHOBkxaChNbjssRPocuNBHnk8uxNgeQJCkR7GnApNUwWcpxOaQ+h/O3xk2OCEkG3h4kr+AIYAKYMOd5KAcmhPWcxtvBE5IE4t2WLXcBEsAEMBGKZLkcQp/Dud8sSgRJ+M7bYBsDJoDJMWXyJCswITuMa93kqyVxUDLwRPl3CpIAJoBJ2uQ4S2kuh8rnrJm3ai4o6SV5EhckAUwAE2VcTiwan9PY/FIRlATiA5FvBUwAk2+ayXM5VD6nqelqlhWO3pAnAUwAkyKXE0l0OSRzCDh/byIwEf5mIz4N+xYwAUzytJDqckh8TiNlYYESBpQAJoCJoi6HxOdwvums6kdJkPTKY88CJoBJoc1hUl1Od3izz6l/vJplCZTwNTYsYAKYFCuS7HLEkPrbQhPRr1ZrYLKyQg/+BjABTC66HEeqyyHwOXUHJlY4umP8FZsVMAFMzmve7BHDeT7n1sCk1lKO1Rn4jAElgAlgcjljMu52pfuc6KYlVGePyS5Zgo0KmAAm6rucW32OU2fzq9UZIVkCmAAmZfOvsl1O7HOenevrOa5T31s5IiwBSgATwKSUFgq4nNvqOfUd4bcLS7BHARPApJRsNpEemNzkc+o7b9sKEZYAJoCJXi6n2x/Orh5DUFtd2Br8jbAEMAFMSutfSricG+o5nG9qSb9aHQ8WBzABTHRzOeLQYTa7dv3UUhcWFgev4QAmgEklmDwqAZMhv7KeU89ZOVbPR1gCmAAmVTRXxOVc7XM482tJl6wZ3ukDTACTKvpUw+Vc73Omdbgca8R4hK0JmAAm1WDyqAhMHq8bK13HTHrBEngcwAQwqSRHGZdzpc+pxeV4zMW+BEwAk6rp14kqLOk/ObNrVg+9y/HYC7YlYAKYVIbJfV8VmDxeM26NvpZjeSjjACaAidYuR/icRfXFQ/3CsMiXYFMCJoBJVS3VcTnX1XPI38uJWYJ8CWACmGjtcq6r57jE7+VYPdRxABPA5DqXM1TI5nTHles5xNMHrPANLAFMAJOrApOJSizpTxy76tohLgyjhx4wAUz0dzmJz6kYmbzSpkxWKOQAJoDJlfqllMsRPqda1oR2lEm8gpB8BUwAk2sk//Ctbz6n4rw10pSJFf7GzAHABDAxweUkPqdq0oSwy2QVIDABTACTq+Q4Y8VcTlWfw9kPUpODuAQwAUzMcDmVfQ7lizmrDqrCgAlgcqVmqrmcyj6HE+Zf0UYPmAAm17ucmXIuR/gcp8rSIXvLzwp/RoAJYAKYXJl+fVCPJd1Jlfdztows/4p3hQETwOQGl/PUV44llQ7j4synggn66AETwOQGlzNX0OV0ux/lfQ7hK8PWiE2xFQETwOQq0dZy+kSqVM9Zs4As/+ozDJAGTAATBVzO4+SJRpP/V2FCEl1lGD0mgAlgcoPNYUM6mDxIWjlUlWHLQ8YEMAFMVHA5w9lyZhOpQgfsC1Vl2OpsEJkAJoDJlVoSupxKJRhCuVSv+Yn5atiIgAlgcp0WlIdvTeTAhOydYXS/AiaAiSIu54M5UhYOWc9aAJgAJoDJlbINcDmcvdHAxAo32IaACWBypRxalzOTs3CIGmCtHrvDPgRMAJMrXQ7l4VtjKS6Hbpo0xjUCJoDJ1TKhlhNHExv00kOAifTIRP9aTvwlqCITD5EJYAKYXKe5CS6HbQlhgsgEMAFMrtKMTehczqOkwIQUJqgMAyaAyVWi7FjrS6rlUCZgARPABDBRweV8VD9uHJEJBJiYAZOlY4LLIU3AvmAfAiaAyVW7kNTlLCV9jTsymIwAE8AEMLlGDnEtJ5K2cOia1mBzABPA5ArNnAnlQTeRvIXDwxUmEECAiTEux5a3cMhe9ANLABPARAGXM5e3cDhGEEDGw8RRQQVXbLMmXE5dV5/NwFINRzpXG27ul4EAk7yHv8KyCY8Y7j85M3nfhG5sIzKwgImykcnClq7lczMu5z/zP+bPWy+/xL2nGygd/i5cOrNfDvlvg00PmJSEScQehvL13/f5t4PY5RR8xsN/33r9JTK7dEdddIKC94Yd5+OR/Kd5lJhoAkz0gomtxCG+/af8d2aacDkEn1Gm5tzEIVxRzF7iX7PfBUwAk5IwUeQQ34fc3eg44yHlZyzyH+cEn/Fx8Wg/l+x4UCv0i07hoozkFCiBASZawYT2EN+rH3/D/KqBTXh1cfRQ8BkE+69EBwvlweXF9ZwlewJMABM5MGmTy6nxM0r4HNFPvyKCSY9tC1Ow5DQBTACTcjAhPcSX3OUwu3aXM2e/hjRb7lKJnW+putbO9q3NqJ0OYAKYlIKJKi7HLqqzEH7GYl7jZ/QnF3tYyI70u/B+zow4CwuYACalYLJUxeXY+dtCE5dT0ueQ1YbPt9Qv2QNluAmYACblIhPnUWWXsxzW/xm/hlR7zmmqNpy87cedMzQZE/6sgAlgUgYmCyVcTndo59ZZaI8YrvkzYp9jN1bOuXR6uc2ce8AEMGkUJjOlXc6S1uXU66Qu+5w51QGhO234mQW0cNiEyuoAJoBJuchEYZfDHD6s/zPo6kUXN92WLgN7eUaSTWZ1ABPApARMFqSv0V3vQGZO3bWc7jCa1/0ZF+fLkmZgL06pjwMxmuAEMAFMSsBk5ijhcgqO/7UbOGKY0OddPsWYMgNbYkjSPA5O7gmKxIAJYFICJpEqLid3F84jwgJnwWcwZ0hZ9nAurB2fkiVW6Lrn11D8lQmKxIAJYHIZJo4iLueZ1V/LmdX/GWXORKfMwIo1ND2Przg4WTzdihPABDC5DJMZ4fFWyrucZc0up4zPmVLNR/qqD/914RePGBs/3eZ1ABPA5DJMFkq7HMep3+WQfkZ3eGnbvTKvQ6oSR4WKLv/bUieACWByESZzRVzOrwZczkcDLueyz+Fs0yFWEIc7l3Bi3xadACaAyUWYLFVxOZ95l7qkdTmfdTupkvWcHqnP6awKRziepE5inAyv5AlgAphchImthsspeJxHc8KrK/oM4jeThpfqOS5pp8mupBOUOXpY4OR58ngVTgATwOQSTFSp5eQ7ENJ+uoJaDv2bSQ8XWuq3tMXhZCGVPJMreXPo4f6K8AQwAUwuwcRmKtdyZg10rJFPmYs/aNawzylPkxgnMRRmIjzpAyaACSlMIsLX6MgdiENaaSpwOfTVrOGlAUlTcp+zo8lLud8/Etc3rsgTwAQwuQCTObNVcDkFbaO0bw0V1XLofd7DxXoOuc8RWViP8ZKrybGjPU9KAwUwAUwuwKSOQxEIXY5Tv8upYcqcFJ+z614rv5zme56I/EkZoAAmgMlFmKjgcoqOiIgacDl1vJk0XFxcP14NMImX03uJEnGKJ8kdeRBAuRihACaAyXmYOGw8VMPl5B6MRXzE8Lz2zyjvc947dUiUiHmVFTXfHZDsxBHK43miACaAyXmYKOJyHotcDl2lqYnP+Pqwp8t9awOrFpp0PFZxSTmRvTNlfzxMnnZEyfM9gAlgch4mM0VcjrOs24H0G6vliA8bRhfGSq8pJ8GeLKm/L/fWfwPK3J7te2PGMVLiKEUErP2UABPA5DxMVHE5H7kLdc4+GnA5z7V8o0t9a4xHodVRw+qkQ5TjVdvjh4fJ5Onp/v7+MdEzYAKYnIPJpxqHbz3mH/dt07qcqO7PqORzpvWkYHdWR1R1rt36Aim2HWGPAyZVYaKIy5nV73Lq/4yMz1lcikwYD1edunDSC9iNC8uZR3ZaoAtgcilnokgtp/6OtfzPqO/NpMs+p4Yu2HRwwtl2i40KmDQFE1sVl5PvQFj9Lqe2KXMl6jnc79QoK/RiL8WxVQGTpmCihMt5cuo8/vfCZ9Q0f6H/6FxuXBtYddJk53WAE8CkEZg4s2FfCZdjVsdaWZ/Dg06tsjoDH9EJYNIITCK1azmE/XTxZzh1f8Z3nzO7uIhqDU12qZMNYy/ACWBSN0xsVY4YbsDl1P8ZJbM0mdDkR6duWeEI0QlgUjtMHMceqjGWPi8ymZP2042LuuKGdbq3/5QemojUSSiiE+ROAJM6YaKKy3Gi+l1O/Z9ROufbXEEnhRMfOAFM6oSJMi4nt4b6Setyct/9WdZZzSrKBTUdmoixSVZnEMQfN0XnGWBSD0zmC0VcTpRfZxnW/xn19uxdGlIvooVNZ9VpQlan53HxgYhPABN6mCjicoZOQZ3lQavPyO/gX176Jdw622C/ux0RnnAXPAFMiGEyU8XlLBuo5dgN13JK+xz+I2yKJjFO4vBkIz71FTwBTChh4qhyxHC+A/mjAZfzXPObSePLNHFZ0GlQMU8G3rv4XPgdwIQMJqq4nHkDLidaSHA5xW8qy8jBZuzOjifb6RpAAUwoYEI5+F35jrVcJ1X7lLmiSZEZbSPeaVhWzJOe9yY+fY0IBTC5HSYLVVxO7n5znoe1fwaza5+/8HGxnlPboPqLPOn0RsFml7dZ34EogMn1MFHliOFF7m4j9WAF81gbmL9QNHc2o7lbyxk6pfIn4WAU+LsFPX1FjAKYXAcTRVzOfVEt56n293KW9Vezis79Oq3oBB1JEgFKGEco/sv+SjgaUQCTyjBZKF3LcezaaznMiRqYMldqpDtvrtkktz02/vCYKF5wWIl8zV9eON8CK4BJGZgsFHE5zwXH/1K6HLv+zyhUGZ8j6sM9iTTZhygiRhnESPF5JmqKycKnL667i1rcl2n8HwI0nGNYPWCSwGTJJmq4nNodSNFnNPJmUjmf09ALf6WIkkQpg9HI84J9NuXcZSd8gTVqOUwipWs5nHI2QhOfURwWjUvUcyRVdM4yJbmcMAx7vUGs0VGeJzATg8bn2QgGTGkrTLgiLqdoLD2ly/lDossp63Oab12rgJVT7f/mDjQihHk7OqO7FyCldTCxVXE5+cf/0rocW1Itp4LPEUYnVJAmZUiz40qSbXnffxkXRGkVTJRwOfmPbYf0raF8l+MsnGbmL5T0OfEqCDraapXKtniHVAuf8juAog05kw8lXI7t1O9yZlJdTnH7rdJpk1szuMc68yva9c2HidIuxzHG5SQX8Fl2SQ20p0mmzjzy/KPrATEMhsm9ui4nviGELqeJz7iUAC65pDjvGUKTL6IMRsH7oYoMapgJEyVcTsFYQ9qOtaLPaK6aVdbnsEi/JGyZdn3xQqG/AwpyKCbCZNJV1+VEzkO3r5GTIqrnxFrrnIQ9+0Lh4Q1lxCcGwkSNWo6Tv8sc9kB2fQUup8kpc8NlhVXldcxUYnl2OZTpGn34RsFEkSOGC4qmc+Y81foZ80arWRcPHU4vq5HVMZYnyQgV8TVfEKAYBJMH+aHJuTFkC4dNKHgXW4xIssspHmedqxeDaXIIUAKXiRm0DihiSDVncS8dJmcHpH6yMQHvij6j0fkL/eHScSosrIHJNDnw5Lf4qltwxASYRESP/lpcTqL4Yf50ex5Wfi2nUj0nSVGyntk0OfAE+VhTIhPHZrZUqxO7nPOZhLnNHm7kXdFnzJxGe/aKBloX0eS38TTZ8WR3JBhwYsBAaZpH/y0O5NLj2mbjG81Ygctpev7CkM2dKkvrrQU02R8J5iM8MeIQrgW/+dF/iz7sixXCOKyYdPvXq2Boopil3W9UFeo5ydp6bwVNdkeCifDkZQuY6A0T8YLKh7Q87HBcIvaPg5eH++s1KWLULf/Sa1QNJvGK8FtCk85qH560+vxjI2AirM5EltUZPjDn4uGZFTKXZq2u1tDkeKA6dwETrWGSPPql5WGfnBKsiGbPV6vw3+48N6tF9eX13h6aHN1OW0dUGwIT8ehfyrI6/cfY6qB1qWB9/W4RTeJ9ELsd3tbajjEwSbKckvKw/e6krUbmou4YH7SJJsLteBvGphww0RcmzKHpNr1O97/YDOTIXWHG98LmJU/+Fi/uACbawmTfciLJ6gwfWASrk7vEIrPf0ynAid8+s2MUTFhkS2s56XefYHUKYxOvs2olTl4BE21hIrazLTUPC3TkaRrTpGXByd7sbNeAibYwkdlyIqzOPAI6cmnyI2wbTZJUbBycbAETXWEi8rASW05gdYrWmd9rHU1inPSCFqVOzIOJ6K535FmdB2YjD5sjl7WtqLPvOxFtbBww0RUmTOKUk6TlBFYnR3e8hYmTBCejv0RFCzDREyaiu15iy8kYVqegqBP8o4U06SSpkzZMdzQTJvJbTjC4PHex/ey1kia71AlgoilMRFkFLSeq6ZWx0aqVOOmM/m1+ItZYmIg87ExmywnysAVWJ2wjTWKvExjfw2YwTPYDzqRZHWcBeORVdTYDa9XK4GSwMTw4MRkmGkw5aaHWrJ1VnX1wwgETPWHC2IxFT7A6ylmdTa+lwcnop8k0MRwmmHKi5qJrc3DyygETPWHCnKXclhNMOclbda+iu76lZR1zrY7xMJF6sI5SLSdORCaHYN0xr6VlnZ7PXgATTWGClhNFMyf+oGO11OqYWdVpA0xEHvZZXsuJrcS0ac6eHsn0QAHIeL0ErUzEWitDrU47YCJ3yskkdhjSf2ibPdGd7HdPEm2Jx/OoncGJaDkBTDSFieQpJ478PGxs9UiPMYTXudXqvAAmmsJEPJrbPeXEYYR5oweqRFDidVqIE6vjmZc4aQ9M2j7lZBb7HLLvc0+WVRY7ymtlmXhkHE1aBBPJU05sydOmF6Q+x3bIIi2+KxO3b0TswLQ0bJtg0vKWEzV9jpDL2bSFOLF6hqVh2wWTVrecEPucGe0yZP6odTixQt8omrQMJmI7/5I65cSMek5/OHMc4oXI3luHE1HUcQETbWEifcqJvDzs3B52CX0O8RcRqZO3/2gZTqxOYFBs0j6YSJ5yItHqzNg9nc95om+dSYobXrsKxZblmUOTFsKEsU+J06YfH9inpJYTWp+zqOFbJDj50S6crMyhSSthIsoqLZxy4jh/qOxz9jgRbWz/7LTI7cQ0cQETfWEiecqJrJYTYp9T05dY70o7LQpPPENa61sKE+ktJ7aMlhOb1Oew2txa4naCQXvCE0No0lqYiLJK21pOHOcXqc+pb/x+gpMkPLFa4nQ4YKIxTETUP5bZcjJrPg9rK17PyQlP2lErNqOm02aYyG05kTHlxI6/Lx0PWc005CL2fxO1YqsNTocDJjrDRORhJbacLBq3Og4bK1/P+R6etIEnKxO619oNE/GsXshsOWl6yolOPueAE3Gmpp/wxGSgmNAL23aYsIXTppaTT1qf04xP49xNeDIwOh9rwFt/rYeJGOgoseXkV9MtJzbh1Y8bG/h0l/idv4OkvmMoUKzem+bTkgCTdk05iWh9ToNxFedT9hWgWEbShAEmusOEze3WtJzYjoY+54snSW/Xz2DUMxIo1kjv5jXAZB+czO77svKwTU45cdiY8No/auxbKzI802SdcSOBonm7CWByCP9b0nJiM7oEUX8i5QiP+S4jy9zAG/TEW/wGIUXrkg5gcnhk23IP1mkqDztzJn1CnyNrOAvfp1DYRhAliVFMQIoVvmuchAVMjlrKnXLSUMsJrc8ZM4nHAXHO9zsvJspIBCn6M0XrJCxgkrI68zYcrEPrc5yl7AXMp4dnOU+QEoZ7puhJFWukL00Ak+xGe5bXcvLcjGewmRE+51uM4h7Wnx8IqOyocsBKRoo31gfsFTAxACbSp5w0UByZm+NzcvIoPJVy4DFWYq6MBFlihQelVq2CeLFCHnHAxACYtOFgnYjW59jKLWm+5l/plPTfcDfvPn9/933/Lf7fGDReEsL0QqWyLVaPTQETE2Ai8rAzs6eckPqc++Y7TSqZn1cRrri5bPnS284Z9UI16szadpsAJjlPbrktJ3Xvzjlx35qjy1LP6G5HGvcr1yL+iWB0qDNLxYmmr/wBJt8l9YDzpz9rtzqUPqc7YTbTXHPOt+uvbMuPOEqR211r9bgLmJgBE+EEHINbTpYO6aHD2sMkRRXX5Xf7ktDuhcIV6sOAyY2SPeWk1paTiNTnPGvjc8oHKnyd7I3A68kaoeLzLWBiCEykTjnp34/rfefFgc8pkWDZTTwIRjJmRlo9tgZMTIGJ0VNOZgw+p2TGVvxfGTzRsqIDmBSHu8ZOOVkQHsbVHY4dhxmrPU/em55pbYW+fm/8ASZngxNbZsvJsrZNSupzHowNTQ575GV7iE9WTeZgXcDEIJjIbjmZ15WHJfY5S2a6uIQjwX5oF5oAJpfysBKnnER1bdOI1ucwh5mvrdjb/n/0mjpQXcNhBIDJBZk55WT+ryF8zhV+hzV4oLoV6GZ0AJOLT3FHYh62roN1iH3OjLVEid3xR424HaunW68JYFImDyvxYB27FprQ+pyZ4zDWHp4wtmkEJ9qVhwGTUjQxreXEcf4k9TkRY+3CSRPRiRVywMQ4mBg45YTU5zy1oJ6TG53UH5q4gIlpMBF52D9ktpyQ52FpfU6bbE4aJzVXduLQZAuYmAcT2S0n5DOI5s/DLqHPsVkbceIP6sWJZlkTwKR0msGsPKxNe+jwkrVP4lXA4J91dsVaIWBiJEwMm3Jiw+fQRCdencHJyptzwMREmEifckIZnDjOH6Q+J2LtxMk29jqr2nCiVxssYFJpBy5lTjl5Jm0Og8+h2kHMq7Guo9Phw4BJ1S1oSssJpc/pD5nDWkuTV7YZ1EUTOfsKMGlGBk05+YDPoQtOasucaDSpHjC54pE+NmLKCbHPsVmLacLZ5p/10ESn6jBgUl2yD9aJqGAyIaSc0+LIJNlH/7seq2P1OGBiMEykTpsWLSefNN+CzUh9zqLdNOHMq+dtHX1SsIDJ9XlY3VtOiH3OjLWdJkEdVR2NUrCAyZVWR/KUEwpTsST1OS2PTGK5bNOjp4kVvulidACT65/rH/JaTn5R9HU4pIdxjUETzvwaaNLRZuIaYHKb1dG65YTW5zgzBpow+jRsvLVeABPDYcLmf8ptOfm8HSakPidioAmnp4kVbjTJmgAmt2UdnnWecjIn9jkOaMLXNcQmAWDSApjo3nJiEx7G1Z/A59QTm2hTzwFMbkxiSp1ysrix7zT2OX1Cn7MAS+qgiRVqkzICTG7Tp9yWk89bvAWtz/lgc7BEvPjHqWs6mvgcwOR2q8P1PVgHPqcG3fG/aLvXdBksDZiQ5GHH99KszvgWmswcUp9jgyS7TeV3VrRJkzVg0hKYSG85uTpZ8Z+o59SzqwJSmIRIwLYHJvpOOYlIfQ5Ck71cNrLalzQBTIg0Y790nHIyc0gPHQZMjjShTMJqMtQEMCG0OtJaTrpXt5ws4HNq0Zb7tEkTFzBpEUykTpvu3i+vjAocQp/Thc9JbSzPIkyasDvApE0w0XPKCXyO4jtLo0mwgAmlFo52LSekcwiG8DmpnRW0LQMLmFAHJxIP1rGvmXLC4XPqysHStdXrkYEFTOqwOvJaTnjljvYZI/U5aII9bi3OW/auH2BCLYktJ91rWk4i0kOH4XPSe4us2USPY0IBkzqCE1ujKSfOwiFk3wN8zlF3dKGJFb5pQBPApAbpNeWE2OcsQZGDpoRZEx8waSdMpE85WVZDH6XPQc7kS+t50KpyDmBSj5YatZxwGz5H7d2lyRQCwOTKyOPi8z7SpuXEZuhbUz0Fa40QmRgbmUSXH/2Sp5yUtzq0PsdGOSe1u6je0Ilh8gKYGAgTh41LPfplTzkpnYd1ItJDh3HkBb3P0aLRBDCpLjGerNSj39Gk5WRGe+gwfM5RUyqfY/XifxdgYh5MxEChkmfqSZ5yUnLaNKXP6Q8XDozOQS7VCzpadK0BJpW1GwFScsBZJHfKSVnLYcPnqJ00EZMbOWBiHEwOh830H59LlGDlTjl5Luc54HPq2180g+q1aIEFTK6AyR4Oott0HpX455VvObFJfU7EARHy/RW+AybmwSQzAOTJKZGHVX/KicP+gM+pKQNL1VHvAybmwSRzpGbJR7/Iw0qbcvJcgnc2rc9BT/3X/hoBJoDJRZdTJcspe8rJ4uL1EfqcR4Z6zkEvZKNgkTMxDybfj+e9t0sYCcWnnDjsAz6nHpvjITIBTIpdTs6j316U+IN/Kjzl5BM+p6b9BZgAJhV2nQYtJ8NLZuw7I2/yOYhMEJkAJpeUP8y93IAzuVNOZmfzsPH3IvQ5GN54kAuYACYVn+DJgLPLVkfmlBPR/++c+2KUPseBzznAhKqagw5YA2FStOee/mQ6TznJVLwJ6jngyH5/DQATwKTADfwanuk2LXF8uC2z5WRcTBPSw7i6H2wBkJDuL3TAGgeTzzN5ypLdpjIPOD835cQmPIyrP4HPOfgcqndzXMDEOJicDSvu7RJFUSeS23JSkIcVU1pQzyHfXlQjCEIGmBiXMxnekuU85mGf1Ws5ofU5Y9Bkt708suFImGdiFkwudp3rPOUkovU5mENAmX8FTAyEycXkqXj0L7WccgKfU8P24iHZDFgcdWGYzXkelshyljpTT/aUk+8jJ+fEPmcOlpClTMR0esyANQomZWel3v/JPi/+yxZcYstJrhlzSH0O5q2RnpvjweaYBZOyXaKlp5yMZbaczGr2OYAJ45uQCiYBewVMDIKJ48xKhhLlp5zIbDmZL04jkw/SvrXWd8HSvTKMs4ZNg0mlEyHOdZt+bV+1ppxQ1nO68DmERw2vOhvAxCiYzKqcyVt6yslYZstJtu60xKHDlHrlVOnXjhVuNUhoAyYVXE5UJYrQsOUkIn4/p+U+55UsMNGjzQQwKa9F1TmpJaeczGS2nGT7/xe0PmfWcpaQBSaiMgyYmASTWWUTULLlRJ0pJ/A5SmZMNKkMAyYVbA67Ild6v9BpygnlocPdYbvnrVGWcvQo5gAm9dRyMi0nn2Ve/RsrMeUkclDPIdpY3A/pApPQB0xMgsnMucoC6DXlxIbPIdtYA7rARI/8K2BSWvOrk5Oljg+X3XKyrMHntJolHp3HkbS7AJP6WPJw06O/zLRpW/6Uk6sSQ0Vq72FcpCZHl/wrYFJWS+d6A1C25cSR33Iyg88hYQlhJUeTcy4Ak/K6rQWj5JQTW/qUE1qf89zSQ4fp3hY+zGzkDDAxBia3NodePlPvkIeV2XIippw4pIcO2+1kiUcal2iSMgFMSoqgzHG/LNESKn3KCXwOwZ4KOqTSJGUCmJSOTG72HyWnnMhuOXEofc6shePWXEaafNUnZQKYlNO/KEZ96NFy4sxIfU7r6jlrtiFmiSZdJoBJaZdDM4Ts3j57fPhOc8ktJ5SHDrfuZb81fVxijdgLYGISTGiqLOLRX+rjfklsOXkgjHQWLavncHqWdDo/NInvAJMyohzc/lQibyJ5ygn61q7VtAaWCJczB0yMgcmMTShD/8uj6+VOOSEkU7t8DmcBfVyixywTwKSsPimHBpXcX0nLie446Q/bdHyOqAmTs0ST8QOASUk57Jlwg5U9nmoh84Bz+JzqW0m83EfPEm1qOYBJufSrMyFMcJZv5LLltZzA51TfSWzUqUFanOUHmFSo5dxTHnW3rPDB0vKwdOx0WsKSTc+qAyYdn90BJsbAxCEe2l4h7hdTTjTPwz6wRQtQUkvqVaf3cgATKS6nWg7BljflBD6nrKbC4tQTl6wCwMQomND2hFZ8901MOdE4D9sCn8Nd5tdkcTpW+H85A0yMgUnscoYyo36pU06a9nV6Zl69sCaW6JR+BUxKBSYSXU6iT3lTTihiMcfkOQScs81gVRdLtHlhGDCR4XKcazIIOrecXMdPfVBSY1iiV/oVMCnjcn4p8E7+kv3StuVkbGoXrEBJ0LPqY4l4xw8wMQgmNqN8i/bqfaVvy0nf1MO4XMb8uoo4OgYmgEnTtZyr66RSD9ZpqudXr7DEqdPh7F/LWQMm5sDEceTWclKasWc9W04+zPM5r7tkSb0ssXrslQEm5sCE2OXcNCtITDnRMDgxz+fwbe3Jkl1gwjlgYhBMZipNMXSWOracGOZzuGj8CHqd2lGi0fvCgEk5l6PWfGVby5aTsTldsFs3/g+vAZToF5gAJo26HHt+86aa69hyMnHMeD+Hu6KCU3uu5LilXhlgYhBMSM+konnnbcbGmuVhDTmMK4kT/FEzKBHNrzwCTAyCiePM1ZuurGHLif4+h4ud7Qt/s2oGJfqMfgVMytZPKM+3+4Po3Af9ppxM9H4/h7+IxR00F5SI14X9/wGYGAWTpaIn79pseQ+f01BI4u7sTRyUNIaS5HxhlwEmRtkcRlrLodtRC82mnIz1JMmdm+zoxN40SJKkLOzOAROTYELrcsaUeQPNppxo2LfG17vKbDBqmiQ6loUBk8tuQk2Xc8jDPsHn1BSR8N1e9r1BKIEkOmZfAZMLmjPSWg7xftJpysnwQ5NDh+f7HAljm11I0jxJRPb1jQMmZsGE1uX8oi+P2vq8+vegemjC+d3afdkvYt8b9aSEJMe3hV0GmBgFE6Vdzh53mrScKOtzOI+4CEYOq9fle47II4mmJgcwuVDLIUxxTsqcV179EiNNWk6K08/xVm5YPNH0xXVTZoJzPxgNYo50ZHJkZ3L4GjAxDCYR6eFbdTWBLtnnPXzO9UvI94PA21FEbjySNjlasgQwObtNVXc5O+bNdWg5iW/AMn8B+v/hSdBoNBoMer2EIQlEVKCIfqdbACalIxNSl1Pbg1mPKSfD59x6DmeBJVWrjlrSbooJYFKm8qqFy9lnitmT8nnYgtccOQ+tDpR6J0fMcQNMzILJjE10cDmJNJhyEt+CWf4KHAAmqY0UaBuYACbnIhM679Cf5GcMKNGneMtJfxg5+SswAELSCZMXBpiYBpO5Pi7nYHUUbzmBzymTMJkywMQ4mMwcQpfTxEhl1aecFA2ag89JJUzet3eAiXkwibRyOfvgROUpJ+KgD/icc1p1NE6YACZnnvPsg9TlNDLOc6H2wTr5Poez3/A52idfAZPmXE5Do4GdT4VbTuBzLuwhT+eECWDSmMtprJVc4ZaTIp/zyjyQROfOV8DkksuhreU0N4JvofAB50U+5w0+R+ygKQdMTISJ7Uy6+rmcQ3DyfN9X1OfY8DlFRWHONWcJYFK4ISmPGG74QDtVW06KqMqZZ7WeJe/aswQwKXI5M/1qOanLV3XKyVgUnHIWod9ZtZsloc+0ZwlgUvRsJ3U5zd+aJXPu4XP0YcnGAJYAJga6nF01SsUpJzFXF/A5uXGJywATM2HisA/Sw7cWEn5ZNQ/WKfY58DiAiZEwIXY5kk55ULDlJI7Scn3OK9EyBEsAE/VgQuly2EzSj6velBPUcwxmCWCS73LGpC4nkvbzLtn4XjWf48DnnOReXQaYGAsTm/Dwrf5wIfO5o1rLSX/izOpchzqyZM0AE3NhMqN1OUuZP7BiU05QzznpVTPG4wAmBS5nZojL2QcntkoHnH/A56R2jWsQSwCTHEWkLieSfmJ35CjUchL7HBs+52vTGMQSwCQ3a0nqcuQfZKfSlJOies4Lb53PWY3Y2iSWACZ5ey8yyeUc8rDKtJx85M5j4Oy9ZWFJx2NGoQQwqbmW0x3O5kr8zgtlWk5in5Obkd62y+dYYWAaSwCTPJg8aXP4VqWvpcbBOkW3xOWjFsHErDIOYFKkeUT4CH9QBibqtJzk961FbarnxNvFPJYAJrXWcmKXwxxlfmtVWk4mrOX1HGvlmVXGAUyacTmfKv3aSR5WVZ/DWUt8TpIuMZAlgMn357djpsvZhV0qtJwMxwX1nKAlFsfXfQw9YNJ2l3OwOvJbTgp8zpa3wOeIirA5b+MAJme1NNjlKGJ1Cus5LfA5Vi/Q/kQLwKS8ESB8cE8Uczn7apXslpPhr4L3cwLjw5LRHTMVJYDJqRakLueXai7nEH3N5LacFLQFc272YVzGZl4Bk1zNzOxY+251ZLactLOeY3UGfxuaeQVMCiIT013OIQ8rs+VkOCtYjIHZYYmpmVfAJJ8ltEcMO8r+8J9Sp5wUlMzN9TlWZ/Rvoy0OYPLd5ThtcDm7TDOT13IS35rc2GRqqM+xRBGHGY4SwOTbDmuFy9lZnaW8lpNh/lyGVzN9jhV6zPiwBDA53V/ELmeh9o8vccpJvs9xmGuez7E6g00bUAKYnLqcCZ3LeVQ7MBGS1nJSNGb7p3FzCFricACTWms5/Yn6MBGlcDkH6wwXebnpNTMsabJqi8MBTL49qIldzlyDBSCr5SSvb42zvwem1XCmrUEJYJLdWLQuJ9JiBch59S9n0PadywKjMiYxSt6ZMcf1ASZVn9KULseZabIGbOY03nLSH0b8dCWyUccyCSWDGCV8zgCTNsLEYXZLOtZOJGXKyUOm1uVMmd8zCyWBOL+DMcCklTCxWQtdjiyrk63nxGvHM8ji7FDC24USwAQu55iHbbjl5DFapFbhemCOxdmhxN0yBpi0FSYO+zXsk+2nD6aXW57bTbecfBx8TvwED4yxOJYVjvxWogQwyW6o8eS+S/J8jl2Oo9tSsNmv5lpO+t3JbH+H1rHFMSUs2aOER4wBJq0fQcCeJ/fD23nSf2Iz7dZC1FzLSf/x4fCpU+YPTEFJp+f9bGGuBDDJj/VF88OYgCdjpmFNsLkpJ/fOPv3Kt6Y0l1i7VEl7UQKY5GwowRP7Np7oVctJ6bOJlpP+cCLeCtpXccxoLrE6O3/jthclgMkZnjxcz5Oi99g0sDrz2ltO+o9jZif5Ej5lGxMyrwhKAJOLPIkSnlyztR6Yrim4uqec9LtPbN9Jz+cmNJdYIlMigpK2owQwucyTp+o86T86jr5LotaWk/7wQUQ/u8zrq/bNJZawN0lQsmYQYHKOJ1FiVirzJOctNq2CkxqnnNzPDpnXtfbNJYIkg+BfCEoAk7Iba7bjyWMVnujrcnaa1XOwTr87OVgc7ZtLdiQRa94FSQCT2njy/Y1YHa0OfcuJaC7ZZV5ji/O3zs0lR3fDXhCUACZVixyzeXme6FvLqTcP+7TYhyUxa/VtLrFExnVHEoAEMLmSJ7awLuNJCZ7o7nL2wQlpy4loLnEW+zWna3OJlZgbUbtBngQwuZUn4sn6EfPkrAUYOkYsjQXllBPRXPKZ3BeH6zm5ZA+SJCRxQRLAhGCHHRrui3mi5Xs5BcEJkdVJN5dw/ZpLrB1IRkFyUrD7CpIAJkSa7/1OYYOsES7nkIelaDkRzSX2fL/e9JpcknCk0xsl1oaxKd+CJIAJbXoyiU8KXjAeRswxZXnQTDm5fz40l+g0uWQXj/RiZ7MDCYe5AUzq5MnHd54UnaOrbXBy45STpLnk+FqfDs0l1i4cCeN4JHjfQ5DfgRWASe08GZ++EPigdfvr96zzbS0norlkl3mNF8hvlZtLrD1ERDQyOoQjbM1RtwFMGuKJiEKe0zwZ/mGOy9l/x1umnDyxr6YbtZpLVtaXxH8PE4jEFPmLHW0NOAKYNM+TxeEFntjl2KYtkqXIw17dXLLPRvPpaKVYLBLG/OgNBiOBkMD/+bUpEo44oANgIoEnh4Z7wZMH82Ai3vO9Jg+bTC45/kveAoXkb3z/7fRr3nE+dRGN3CCf6NdpMUzSPHn8YCY+0q7ork81l6j7LOV8zV/i/4Gjab1+KHU1kW1wZFy55SQ1ueRr5yqi7fYO9KgJziQCTNjhBR4jVXXKyf1Y/9cdIUQmUC2asfF99eYSCAJMoG9xV9mWk9TkEggCTKAcq1MyD/vkGFjSggATiFIlppykm0sgCDCBCrRwLuRhRXPJEhYHAkygi5qdszo6NJdAEGCijNUpbDn53lwCQYAJVKjiKSf3Y/aJ+wMBJlBpLfOmnKSOxYEgwAQqp5yWk9TkEggCTKCycr5Nm0bmFQJMoCutTmrKici8orkEAkyg66zO4piHTSaXwOJAgAl0pfZWB80lEGAC3UwT0XLydSwOBAEm0HUSU06enjG5BAJMIIrgBJNLIMAEIlA0Q+YVAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIMAEgiAIMIEgCDCBIAgwgSAIMIEgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIMAEgiAIMIEgCDCBIAgwgSAIMIEgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIMAEgiAIMIEgCDCBIAgwgSAIMIEgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIMAEgiAIMIEgCDCBIAgwgSAIMMEtgCAIMIEgCDCBIAgwgSAIAkwgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIAgwgSAIMIEgCDCBIAgwgSAIAkwgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIAgwgSAIMIEgCDCBIAgwgSAIAkwgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIAgwgSAIMIEgCDCBIAgwgSAIAkwgCAJMIAgCTCAIAkwgCIIAEwiCABMIggATCIIAEwiCIMAEgiDABIIgwASCIAgwUUCc82i7veN8jnsBASbQlRiZcp7Fipv5CxCkO0z4eb2K/1D/cX+Qule4+3/e3v0gCPz3t/1/d1+58jdVjV+2qhRcnGqv0Wu3UdXIhL/wNR6i12ruinv3HniDXhh29gp7g5H3Lv72FHcWMiIy4Szwzit+jr5ln67KEdX3N74Q37ypyPv4P3yvF3YsoQNMdv9/OAj8+B95VXCJbHhyT/33zYu0i3j5a/fDVtfvd1UW62aT/Q7vG1XTZZvNe3KF8fXOr4KJy0bWWa32T9FA/DhzfqfcLbhjfnjQPwZMNeDF18O9XieFkbTi+xvzJP5H1mpdtcu8fxxvqifppvLURVSXr8JS4Ozt24X9Y8RUfCpzNvjHVTcvC5POJe2g0hsFhwetYjDpWKvdU9/qKfY7vXL2YxRa1tmb2+l5jKllI7lYFtb+pnpsKgsmh4uoqpXVUQMm/NtX6Fjhm4q1PM56+0utePMqwuS46sORrxxOBEyOl6gWTMSd8s6jZHfZnV7A1Lry1LKQC5OrpUhk0vv+FVYBWysKk2tu3lUw2T9FxbKPAJNyDifoWaVur9UZbBh3ABMqmKyUgAlPrc3Ujz1Q0ec0DhMVn6LKwoSzvwed0jfXCj2FYj7AhETTgt3lK0gTGTBJnqKBQsGJqjB5YUFY5dZa1mDOtoCJWZFJ7hKwPMAkhZOROsGJojCJd0JuWHJIw+X9rd5GlcsHTGi+QJC/f3qASeZ2KBOpKQkTJ96NqxyOdDphGPaS3rUcolihKndV/wRsqARMijZXwCLTYVJUaMujyUqVUE1JmHxn9MrqhINR8O4nq+jNF/2wndNba4WbOQdMUjC5vCKL/gkVYPI7PGlSPPyXEXsxHSa9QY7i52jeY3TVUaT3RkWYfEu8WSLRtNn/asc8azAKT6yQ1XtTIgurCEyCf/bylbplBf/EgEtfChmXk7lqK1Svm5wYJvGqyf+Yt2A0CL9lACw1aKIgTF5O43MradBhL1MeJavo63Uq0RyrYNlQCZgUK/OLKyvOBtZxAYi/MLBSPsc1HSY/f/88EZ/uWzM3weA0KleDJurBJH4irU7y1RvxPt+3S9uKBRVk25rUyPSrApOCN4LTv/idqm8Nc/Z+fFDEW+XnX/zrERM/M4yHSf6/Yi4mb4iPG4XfaDIFTL7/Kn4m2rAGZ9qG3VcWjbLBiQrJOaUjE65uz/Npyif1o645//u4f1bqtZo0BJPdZwmevJ+sexUeo+rBhKdjjYtldPe/Ymud/gM9Bd76A0xu1+vX7oxdDs/YHgVbTZqECds9Xf2Tdw0C6fdENZhk64GWuEPnr8n5mW1vU2GdASa0V5mE8K+phKx6190wTER4wtgom1nkWw6YZBMmnROWXPwzbiY2sUKfc8BEd5hk6qS7bsQtD6/br0bCJMkZetmgXHYmSS2Y8JP3RMtFbi+ZlK0CiW3AhGBdfrmc/UVm7uoIMNk9elUKyhWDSbYqXPbmZP6Y6EKYAyZ6wyQdoVreLtS8Y+/qtppIgUkSlGdegdzeASbHwCTV9CiePmXDtpf0Tyk/awKYkLqcw97MbNiAccBEzPSzMm1WLmBSFGE4pSkUdJQKsACTWx8rofUtFfCSbTUBTGL9le0WD6QGbGrB5Ee6LlPl2ZOuG8rPzgEmN+p/ZlzO4Rqd+MpXx0fND8WG68mBydzNBOVyQxOVYJINTCo9erKhiRevRsBEY5i46Vb6r62pcKuJLJiw7V1mHJ1UxKoFk3Qpx680QWqb+rPSu60Bkxsvcf6VO0s/VBRuNZEGk2xnllz3pxBMOPtx/St7L/PUL9GTPHMNMCEMUVMv9XHuqtpqIhEm/C01qiF8Z3PA5HTyQMVUUqbbLb6jHDDRGSYpl5OeKnHSavICmCT7xsuUMl3AJDvys/KlzNlbptltC5hoC5PMFQ7St48r63MkwmTO30M1qlzqwCRzsEH19JpA0VGe3KQJYELpctZFezZQ6jAFaTDJLjeZAzdVgkm6/+a9OkxGX+czAiZ6wyT1wnDW7aYXSfwQfgFMTi3+KmCvgEmm7qfuq/GASd3aptvmT7qgMxcfvjEHMGGZFj+pqSR1YBJl70j1K1FnThhgcosyifhTK5PetCq1msiFSfY5vG49TLJnQao35BMwkfBU+X59Jz4HMPl2UySWMhWCSfoFyDfYnLbCJFOxGX2LMh0/1WryptCpcVJhEihxeqpCMEnTVWuWACa3KPeF4YKQ3gNM9h//RViJGViFYDIyJf8KmNx2gWdczrdWk/8BmLDMKCmZhFUGJplbOQBM2gqTzPs3nvP98tKlC3VaTeTCZJ0O1+SVcxSKTDL3YwqYtBMmqReGV7ndRmq21MuFCVfjSawqTFzApKU2JzWzZJB367KtJq4zB0xOw/qfgEnG9gEm7YTJNDVNbZW/o7YqttQrFZm0HiZuFiawOe2ESaaVPr/D1VVxeqPsyMQDTK6BCS8twEQ7mNylXv4uAkW2vVGRqSawOYhMABOu7J07eWE4vVTSrSZ8CpjA5pzNmRQk6V+ZF/bCUuqF0grugAmJy4mKjqvPtppEgAkik9Nfo0w1R2zT0pJWEwJMrr62dCt9Ydk3Paiw8yNew4hMBipMQFbI5pTpMzk58u+sABPtYOJmXc62zINYjZ4khWCCprX4BpTpu+HZM4cAE6NgwjNnb53LrQeqHRQqGyYh2umLc0iASRthkj1765x6l/O07YGJ+ElVaL1R9a3hLWDSRpikzmUcjAbFGvUUazVRagTBFjBJh66/GWDSOphw9lf63PrzSvscBb6EVJhMMw/in4hMtieT1jhg0jqYzMtn1zu3nGRgGkzW6baKnrz1ptBAabdEEgkwMRgmbub0+fIw6bUcJpmUyVXjk82DCSvhg+P7FhTp6xS43u4v+Gha0wkm2Tb5KvLlt5pIhQlPR3QBYHJ6lNC8+pWMUmddy15ZgEljLkeNqSZyI5PUYzj8wf8LMHk9SUnfFbmh11z9e52CyXoT/xWXAyZ6RSa9K2ESOrzFMOE8fRQmjgfd/Rxvtxyc8zMTmXDJKwswadDliND+tcUwyaSaAsDk9KbEl3IHmLQMJiPrSpYo0GoiDyac83SQNpV4J5SCSSaPVLFLGjDRHSbpQdFVfY70A3QkwiQdmMhNHykEk3nG5wwqNkkDJnrDJNO0OAjKKD2zwmkrTNxMqrHzNkdkkmf++BowaRNMMi8Ml5GnxAG7cmHCo/QJhzKbTJSDSXB9KxJgojVM5s5XWCoOdLysaTpXIH16ozSYZEtgPgdM8u5MxS5pwERrmJyMRZqW+iMDS5FHsjSY/MxkrWXfBcVgkg5NwkqYBUw0h8kgvRnLjGJcM2+l5nOwKZjwbAXMCn9sAZPU+kiHJpWYAJjoDBPO3r/O3ip9Ub/VOShUBkyik2r6SvZkF7Vgkh3MUClq+8kBE41hkj4Lp+zA+Wl2emPbYMJZliXyu23UgslJQadTodr+++tPAiYaRiapvchLJx8DZVpNGodJbHE2mdyr1Zu6gEn2FqUrXeKAyHIdfcI9qoNowOQKl3PFNaV38CpoE0yiF8a8TJOfJXHCmqIwEW2wq7QNHLESr13w+NYOLMBEW5i8XNf8OS01N9g4mHDuMuYPOpZi7ycpB5NTo2MN/mYvF4gb39ogHfEpkNoHTCopSp+95VeITJQ5KLQhmDgxSMTf+IaSOIZ3GWDyDbs8awXDIHExhf987IN+j7K31pMMacCk6iUF14WV2WMgZR4USg6T7116Pw/HZ795pyhRY3SlejCJr2hzYgYHAifTu5xr22E6ax7lNzABJjfcrzhcL/+IzRSBeupEJpf7dy9HJvnyg9EgtKzvY3BdBpgUPKeydEhwkgQtd/ufQfwebkIS7p3c2/jRNmWAiVYwSZ29FXJeafpp5qDQrRowqXJP82HS6Y2+azDohcnU/lOUrDz5o+YUhcl3msT/rTfyv3zQ6+EyNyLgs1SbbQGYNORylDkX8wQmvUv651fpqQAmF0/4SK34fwRKxCVqwkSsrn+cmkKrEw68wH8/hHt+4I16nZW1+jYnZw2Y6AaTwbWdrNlWEz5XAybWRX2FEgUwKa2VNfipyjsRd4q+qbH5Pikn4XIYJmgPc+O9pJTMVahIASZVTE7a5dzdXftnpVZHqw2wpYOJ1fGYMmMk1IRJfGN/5v845+K95M6ulXjUAiZVLsizKr4w/KUXRVpN5MDE6gx8JVa80jBJXjxYVby3Vi9QY+MCJg25nKzPWXU20r6ODJhYnV7AVDpF7U7Zgw+46ESr8gN1RkyZnA9g0tT1ZFtN2gOTeGv04j/rqnTwvLIwEc3SooNkVTrgix9qWwaY6AaTF5Z5Ybg6TJRoNWkWJqIcMTrfzAmYfAtOfo/CMtHJjtJKntoAmFTZhv4VkYkSLfVNwWSV5AvDQbBWDiVJv2nHUhQmCR78Udg5zxNr19S2vmOASamLU+oX36ZO3Y4vp3o5Zp1tNXG1hsl5dZJq5sjz949aphxM/FClfq/vwQljwaCQJ+IO98TNVerWZkJvT7GbKk5OVOr0qptcTgwTHqR8DueOHjCZfoMJZ8HonDzPC3x/vy3WDlNR3D9os1Hx8sTyeg9GvWNZeLVaHUndGySYVo7Sb5vjTf2t3gPk7e1wcb4Cl+P7+yX45v+vq/4FzoYfv4+8heAff/LL2rwd/9iPyjkm7m4ZdKWcdRISipbXQS8U7WpxsBf2BqMY1DvccNwkSFOlYXL3Mi1W8hrJVmKTb8ln//d3GZW7xCONuft78/ZVEFP0oh2l76lav/jtV6PE9+FVxK6PTCCqHytK/9cY1nPcF8iYyASS8swHRCDABIIgCDCBIIhW/x9IAIcG/w0h8gAAAABJRU5ErkJggg==">
+</div>
+<script>
+/* Liquid particle hero engine — WebGL2 GPGPU particles.
+ * Based on "Sculpture Hero" by guglielmogiannattasio.it, ported from React/TS to plain JS for AST Digital. */
+(() => {
+  var __defProp = Object.defineProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: !0, configurable: !0, writable: !0, value }) : obj[key] = value;
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key != "symbol" ? key + "" : key, value);
+  function clamp(v, a, b) {
+    return Math.min(b, Math.max(a, v));
+  }
+  function hexToRgb(hex, fallback) {
+    if (typeof hex != "string") return fallback;
+    const s = hex.trim();
+    let m = s.match(/^#?([0-9a-f]{3})$/i);
+    if (m) {
+      const [r, g, b] = m[1].split("").map((c) => parseInt(c + c, 16) / 255);
+      return [r, g, b];
+    }
+    if (m = s.match(/^#?([0-9a-f]{6})([0-9a-f]{2})?$/i), m) {
+      const n = parseInt(m[1], 16);
+      return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
+    }
+    return m = s.match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i), m ? [+m[1] / 255, +m[2] / 255, +m[3] / 255] : fallback;
+  }
+  const NOISE = `
+float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
+float vnoise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*f*(f*(f*6.0-15.0)+10.0);
+  return mix(mix(hash(i),hash(i+vec2(1.0,0.0)),u.x), mix(hash(i+vec2(0.0,1.0)),hash(i+vec2(1.0,1.0)),u.x), u.y); }
+vec2 ambientField(vec2 uv, float t){
+  vec2 q = uv*vec2(3.2,1.7);
+  vec2 a = vec2(vnoise(q+vec2(t*0.11,0.0))-0.5, vnoise(q+vec2(5.2,t*0.08)+3.1)-0.5);
+  vec2 q2 = uv*vec2(7.5,4.0) + vec2(-t*0.19, t*0.13);
+  vec2 b = vec2(vnoise(q2+1.7)-0.5, vnoise(q2+9.3)-0.5);
+  return a + b*0.45;
+}
+`, ENERGY = `
+float energyAt(vec2 rectPx, vec2 mouse, float radius, float presence, float wakeEnergy){
+  vec2 d = rectPx - mouse;
+  float f = exp(-dot(d,d)/(radius*radius))*presence;
+  return smoothstep(0.06, 0.5, f*1.15 + wakeEnergy*1.7);
+}
+`, QUAD_VS = `#version 300 es
+layout(location=0) in vec2 aPos;
+out vec2 vUv;
+void main(){ vUv = aPos*0.5+0.5; gl_Position = vec4(aPos,0.0,1.0); }
+`, FLOW_FS = `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 o;
+uniform sampler2D uPrev;
+uniform vec2 uTexel;
+uniform vec2 uMouse;
+uniform vec2 uVel;
+uniform vec2 uSize;
+uniform float uRadius;
+uniform float uPresence;
+uniform float uDecay;
+vec2 decV(vec4 c){ return (c.rg*255.0-128.0)/127.0; }
+void main(){
+  vec2 v0 = decV(texture(uPrev, vUv));
+  vec2 uv = vUv - v0*uTexel*2.5;
+  vec4 c = texture(uPrev, uv)*0.52
+    + 0.12*(texture(uPrev, uv+vec2(uTexel.x,0.0)) + texture(uPrev, uv-vec2(uTexel.x,0.0))
+          + texture(uPrev, uv+vec2(0.0,uTexel.y)) + texture(uPrev, uv-vec2(0.0,uTexel.y)));
+  vec2 v = decV(c);
+  float p = c.b;
+  vec2 d = (vUv-uMouse)*uSize;
+  float f = exp(-dot(d,d)/(uRadius*uRadius))*uPresence;
+  float sp = clamp(length(uVel)*2.5, 0.0, 1.0);
+  v += uVel*f*0.22;
+  p = max(p, f*sp);
+  v *= uDecay;
+  p *= uDecay;
+  v = sign(v)*max(abs(v)-1.2/127.0, 0.0);
+  p = max(p-1.2/255.0, 0.0);
+  v = clamp(v, -1.0, 1.0);
+  o = vec4((v*127.0+128.0)/255.0, p, 1.0);
+}
+`, SIM_FS = `#version 300 es
+precision highp float;
+out vec4 o;
+uniform sampler2D uState;
+uniform sampler2D uHome;
+uniform sampler2D uFlow;
+uniform vec2 uSize;
+uniform vec2 uMouse;
+uniform float uRadius;
+uniform float uPresence;
+uniform float uStrength;
+uniform float uSpread;
+uniform float uTurb;
+uniform float uReturn;
+uniform float uTime;
+uniform float uDt;
+uniform float uIntro;
+${NOISE}
+vec2 curl(vec2 p){
+  const float e = 0.35;
+  float a = vnoise(p+vec2(0.0,e)) - vnoise(p-vec2(0.0,e));
+  float b = vnoise(p+vec2(e,0.0)) - vnoise(p-vec2(e,0.0));
+  return vec2(a, -b)/(2.0*e);
+}
+void main(){
+  ivec2 ij = ivec2(gl_FragCoord.xy);
+  vec4 hm = texelFetch(uHome, ij, 0);
+  if(hm.w <= 0.0){ o = vec4(0.0); return; }
+  vec4 st = texelFetch(uState, ij, 0);
+  vec2 off = st.xy;
+  vec2 vel = st.zw;
+  float sd = hm.z;
+  float light = 0.45 + sd*1.1;
+
+  vec2 p = hm.xy*uSize + off;
+  vec4 fl = texture(uFlow, clamp(p/uSize, 0.0, 1.0));
+  vec2 wake = (fl.rg*255.0-128.0)/127.0;
+  float pr = fl.b;
+
+  vec2 toM = p - uMouse;
+  float r2 = dot(toM,toM);
+  float f = exp(-r2/(uRadius*uRadius))*uPresence;
+  vec2 n = toM*inversesqrt(r2+1.0);
+  float e = clamp(pr*2.0 + f, 0.0, 1.0);
+
+  vec2 acc = vec2(0.0);
+  // blown outward and swirled around the cursor
+  acc += n*f*1.25*uStrength*uSpread*light;
+  acc += vec2(-n.y, n.x)*f*1.45*uStrength*uSpread*(0.4+sd);
+  // carried by the liquid wake
+  acc += (wake*42.0*uSpread*light - vel)*e*0.08;
+  // curl-noise turbulence where the material is disturbed (and during the intro)
+  vec2 q = p*0.0095 + vec2(uTime*0.35, -uTime*0.2);
+  vec2 c = curl(q) + 0.5*curl(q*2.3 + 7.1);
+  acc += c*(e*1.2*uSpread + uIntro*1.5)*uTurb*light;
+  // elastic return home
+  float k = (0.006 + 0.02*uReturn)*(0.65+sd*0.7)*(1.0 - uIntro*0.75);
+  acc -= off*k;
+
+  vel += acc*uDt;
+  vel *= pow(mix(0.93, 0.955, e), uDt);
+  off += vel*uDt;
+  if(dot(off,off) < 0.0004 && dot(vel,vel) < 0.0004){ off = vec2(0.0); vel = vec2(0.0); }
+  o = vec4(off, vel);
+}
+`, PART_VS = `#version 300 es
+precision highp float;
+layout(location=0) in vec2 aCorner;
+uniform sampler2D uState;
+uniform sampler2D uHome;
+uniform sampler2D uCol;
+uniform sampler2D uFlow;
+uniform int uTexW;
+uniform vec4 uRect;
+uniform vec2 uRes;
+uniform vec2 uMouse;
+uniform float uRadius;
+uniform float uPresence;
+uniform float uDot;
+uniform float uTime;
+uniform float uAmbient;
+uniform float uStreak;
+uniform float uIntroVis;
+uniform float uRest;
+uniform vec3 uTint;
+out vec2 vLocal;
+out float vHalfLen;
+out float vR;
+out vec3 vCol;
+out float vA;
+${NOISE}
+${ENERGY}
+void main(){
+  int id = gl_InstanceID;
+  ivec2 ij = ivec2(id % uTexW, id / uTexW);
+  vec4 hm = texelFetch(uHome, ij, 0);
+  vec4 st = texelFetch(uState, ij, 0);
+  vec4 cl = texelFetch(uCol, ij, 0);
+
+  float wakeE = texture(uFlow, hm.xy).b;
+  float E = energyAt(hm.xy*uRect.zw, uMouse, uRadius, uPresence, wakeE);
+  float lift = smoothstep(0.35, 2.5, length(st.xy));
+  float a = max(max(E, lift), max(uRest, 1.0-uIntroVis));
+  if(a < 0.01 || hm.w <= 0.0){ gl_Position = vec4(2.0,2.0,2.0,1.0); return; }
+
+  vec2 base = uRect.xy + hm.xy*uRect.zw + st.xy;
+  base -= ambientField(hm.xy, uTime)*10.0*uAmbient;
+
+  vec2 v = st.zw;
+  float sp = length(v);
+  vec2 dir = sp > 0.001 ? v/sp : vec2(1.0,0.0);
+  float r = uDot*hm.w*0.5;
+  float len = min(sp*1.25, 18.0)*uStreak;
+  vec2 lc = aCorner*vec2(r + len*0.5 + 1.0, r + 1.0);
+  vec2 center = base - dir*len*0.5;
+  vec2 world = center + dir*lc.x + vec2(-dir.y, dir.x)*lc.y;
+
+  vec2 clip = world/uRes*2.0-1.0;
+  gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+  vLocal = lc;
+  vHalfLen = len*0.5;
+  vR = r;
+  vec3 col = cl.rgb*uTint;
+  // fast material catches the light, like liquid metal
+  float glint = smoothstep(2.0, 16.0, sp);
+  col = mix(col, min(col*1.18 + vec3(0.07,0.075,0.085), vec3(1.0)), glint*0.75);
+  vCol = col;
+  vA = a;
+}
+`, PART_FS = `#version 300 es
+precision highp float;
+in vec2 vLocal;
+in float vHalfLen;
+in float vR;
+in vec3 vCol;
+in float vA;
+uniform float uDpr;
+out vec4 o;
+void main(){
+  vec2 q = vec2(max(abs(vLocal.x)-vHalfLen, 0.0), vLocal.y);
+  float d = length(q) - vR;
+  float a = clamp(0.5 - d*uDpr, 0.0, 1.0);
+  // comet tail: the trailing end thins out
+  float tail = vHalfLen > 0.0 ? clamp(0.5 - vLocal.x/(2.0*(vHalfLen+vR)), 0.0, 1.0) : 0.0;
+  a *= 1.0 - tail*0.55;
+  a *= vA;
+  if(a < 0.004) discard;
+  o = vec4(vCol*a, a);
+}
+`, IMAGE_FS = `#version 300 es
+precision highp float;
+out vec4 o;
+uniform sampler2D uImg;
+uniform sampler2D uFlow;
+uniform vec2 uRes;
+uniform float uDpr;
+uniform vec4 uRect;
+uniform vec3 uBg;
+uniform vec3 uImgBg;
+uniform vec2 uMouse;
+uniform float uPresence;
+uniform float uRadius;
+uniform float uStrength;
+uniform float uTime;
+uniform float uAmbient;
+uniform float uIntroVis;
+uniform float uRest;
+uniform float uAlphaMode;
+${NOISE}
+${ENERGY}
+void main(){
+  vec2 px = vec2(gl_FragCoord.x, uRes.y*uDpr - gl_FragCoord.y)/uDpr;
+  vec2 size = uRect.zw;
+  vec2 uv = (px-uRect.xy)/size;
+  if(uv.x < -0.05 || uv.x > 1.05 || uv.y < -0.12 || uv.y > 1.12){ o = vec4(0.0); return; }
+  vec4 fl = texture(uFlow, clamp(uv,0.0,1.0));
+  vec2 vel = (fl.rg*255.0-128.0)/127.0;
+  vec2 rp = uv*size;
+  vec2 toM = rp - uMouse;
+  float fall = exp(-dot(toM,toM)/(uRadius*uRadius))*uPresence;
+  vec2 disp = -toM*0.22*uStrength*fall - vel*10.0*uStrength;
+  disp += ambientField(uv, uTime)*10.0*uAmbient;
+  vec2 suv = uv + disp/size;
+  vec4 tx = texture(uImg, suv);
+  vec3 col = tx.rgb;
+  vec2 e = smoothstep(vec2(0.0), vec2(0.004,0.01), suv) * smoothstep(vec2(1.0), vec2(0.996,0.99), suv);
+  // cut-out images carry their own alpha; flat-background images are keyed by colour
+  float key = uAlphaMode > 0.5 ? tx.a : smoothstep(0.012, 0.05, length(col-uImgBg));
+  float k = key*e.x*e.y;
+  float E = energyAt(rp, uMouse, uRadius, uPresence, fl.b);
+  float show = (1.0 - max(E, uRest))*uIntroVis;
+  vec3 mat = uAlphaMode > 0.5 ? col : col*(uBg/max(uImgBg, vec3(0.001)));
+  // premultiplied: empty areas stay transparent so the page (and the backdrop word) shows through
+  float A = k*show;
+  o = vec4(mat*A, A);
+}
+`;
+  function compile(gl, vs, fs) {
+    const make = (type, src) => {
+      const sh = gl.createShader(type);
+      if (gl.shaderSource(sh, src), gl.compileShader(sh), !gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(sh);
+        throw gl.deleteShader(sh), new Error("Shader: " + log);
+      }
+      return sh;
+    }, p = gl.createProgram(), v = make(gl.VERTEX_SHADER, vs), f = make(gl.FRAGMENT_SHADER, fs);
+    if (gl.attachShader(p, v), gl.attachShader(p, f), gl.bindAttribLocation(p, 0, "aPos"), gl.linkProgram(p), gl.deleteShader(v), gl.deleteShader(f), !gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error("Link: " + gl.getProgramInfoLog(p));
+    const u = {}, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) {
+      const info = gl.getActiveUniform(p, i);
+      info && (u[info.name] = gl.getUniformLocation(p, info.name));
+    }
+    return { p, u };
+  }
+  const TEX_W = 1024, SETTLE_FRAMES = 270;
+  class LiquidEngine {
+    constructor(canvas, opts, onFail) {
+      __publicField(this, "lastImage", null);
+      /** Called once, after the first frame has actually been drawn. */
+      __publicField(this, "onFirstFrame", null);
+      __publicField(this, "canvas");
+      __publicField(this, "gl");
+      __publicField(this, "opts");
+      __publicField(this, "onFail");
+      __publicField(this, "lowPower", !1);
+      __publicField(this, "stateFormat", { internal: 0, type: 0 });
+      __publicField(this, "pFlow");
+      __publicField(this, "pSim");
+      __publicField(this, "pPart");
+      __publicField(this, "pImg");
+      __publicField(this, "vao");
+      __publicField(this, "quad");
+      __publicField(this, "imgTex", null);
+      __publicField(this, "flowTex", []);
+      __publicField(this, "flowFb", []);
+      __publicField(this, "flowW", 256);
+      __publicField(this, "flowH", 104);
+      __publicField(this, "flowIdx", 0);
+      __publicField(this, "flowDirty", !1);
+      __publicField(this, "homeTex", null);
+      __publicField(this, "colTex", null);
+      __publicField(this, "stateTex", []);
+      __publicField(this, "stateFb", []);
+      __publicField(this, "stateIdx", 0);
+      __publicField(this, "texH", 1);
+      __publicField(this, "n", 0);
+      __publicField(this, "gridW", 1);
+      __publicField(this, "stateDirty", !1);
+      __publicField(this, "alphaMode", !1);
+      __publicField(this, "imgBg", [0.918, 0.914, 0.906]);
+      __publicField(this, "flowing", 0);
+      __publicField(this, "aspect", 2.5);
+      __publicField(this, "rect", { x: 0, y: 0, w: 1, h: 1 });
+      __publicField(this, "cssW", 1);
+      __publicField(this, "cssH", 1);
+      __publicField(this, "target", { x: -9999, y: -9999 });
+      __publicField(this, "mouse", { x: -9999, y: -9999 });
+      __publicField(this, "prevMouse", { x: -9999, y: -9999 });
+      __publicField(this, "mvel", { x: 0, y: 0 });
+      __publicField(this, "presence", 0);
+      __publicField(this, "presenceTarget", 0);
+      __publicField(this, "burst", 0);
+      __publicField(this, "lastInput", -1e9);
+      __publicField(this, "settle", 1e9);
+      __publicField(this, "touchRelease", 0);
+      __publicField(this, "time", 0);
+      __publicField(this, "introT", 1);
+      __publicField(this, "raf", 0);
+      __publicField(this, "running", !1);
+      __publicField(this, "last", 0);
+      __publicField(this, "skip", 0);
+      __publicField(this, "visible", !0);
+      __publicField(this, "ready", !1);
+      __publicField(this, "destroyed", !1);
+      __publicField(this, "lost", !1);
+      __publicField(this, "onLost", (e) => {
+        e.preventDefault(), this.lost = !0, this.stop(), this.onFail();
+      });
+      __publicField(this, "homeData", null);
+      __publicField(this, "frame", (now) => {
+        if (!this.running) return;
+        const rawMs = now - this.last, dt = clamp(rawMs / 16.6667, 0.25, 3);
+        this.last = now;
+        const o = this.opts, ambientOn = o.ambient && !o.reducedMotion;
+        this.touchRelease && now > this.touchRelease && (this.presenceTarget = 0, this.touchRelease = 0);
+        const ease = 1 - Math.pow(1 - 0.22, dt);
+        this.mouse.x += (this.target.x - this.mouse.x) * ease, this.mouse.y += (this.target.y - this.mouse.y) * ease;
+        const vx = (this.mouse.x - this.prevMouse.x) / dt, vy = (this.mouse.y - this.prevMouse.y) / dt;
+        this.prevMouse.x = this.mouse.x, this.prevMouse.y = this.mouse.y, this.mvel.x += (clamp(vx, -60, 60) - this.mvel.x) * 0.5, this.mvel.y += (clamp(vy, -60, 60) - this.mvel.y) * 0.5;
+        const pk = this.presenceTarget > this.presence ? 0.1 : 0.035;
+        this.presence += (this.presenceTarget - this.presence) * (1 - Math.pow(1 - pk, dt)), this.presence < 1e-3 && this.presenceTarget === 0 && (this.presence = 0);
+        const fk = this.presenceTarget > this.flowing ? 0.05 : 0.018;
+        this.flowing += (this.presenceTarget - this.flowing) * (1 - Math.pow(1 - fk, dt)), this.flowing < 2e-3 && this.presenceTarget === 0 && (this.flowing = 0), this.introT < 1 && (this.introT = Math.min(1, this.introT + Math.min(rawMs, 100) / 3200));
+        const interacting = this.presence > 1e-3 || this.burst > 0;
+        if (this.settle = interacting ? 0 : this.settle + dt, !(interacting || this.settle < SETTLE_FRAMES || this.introT < 1)) {
+          if (this.flowDirty && this.clearFlow(), this.stateDirty && this.clearState(), !ambientOn) {
+            this.draw(), this.firstFrame(), this.stop();
+            return;
+          }
+          if (this.raf = requestAnimationFrame(this.frame), this.skip++ % 2) return;
+          this.time += dt * 2 * o.speed / 60, this.draw(), this.firstFrame();
+          return;
+        }
+        this.raf = requestAnimationFrame(this.frame), this.time += dt * o.speed * (1 + this.flowing * 1.6) / 60, this.stepFlow(dt), this.stepSim(dt), this.burst = Math.max(0, this.burst - 0.1 * dt), this.draw(), this.firstFrame();
+      });
+      this.canvas = canvas, this.opts = opts, this.onFail = onFail;
+      const gl = canvas.getContext("webgl2", {
+        alpha: !0,
+        antialias: !1,
+        depth: !1,
+        stencil: !1,
+        premultipliedAlpha: !0,
+        preserveDrawingBuffer: !1,
+        powerPreference: "high-performance"
+      });
+      if (!gl) throw new Error("WebGL2 unavailable");
+      this.gl = gl;
+      const nav = navigator;
+      this.lowPower = (nav.hardwareConcurrency || 8) <= 4 || (nav.deviceMemory || 8) <= 4 || window.matchMedia("(pointer: coarse)").matches, this.initGL(), canvas.addEventListener("webglcontextlost", this.onLost, !1);
+    }
+    initGL() {
+      const gl = this.gl, full = gl.getExtension("EXT_color_buffer_float"), half = full ? null : gl.getExtension("EXT_color_buffer_half_float");
+      if (!full && !half) throw new Error("No float render targets");
+      this.stateFormat = { internal: gl.RGBA16F, type: gl.HALF_FLOAT }, this.pFlow = compile(gl, QUAD_VS, FLOW_FS), this.pSim = compile(gl, QUAD_VS, SIM_FS), this.pPart = compile(gl, PART_VS, PART_FS), this.pImg = compile(gl, QUAD_VS, IMAGE_FS), this.vao = gl.createVertexArray(), gl.bindVertexArray(this.vao), this.quad = gl.createBuffer(), gl.bindBuffer(gl.ARRAY_BUFFER, this.quad), gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW), gl.enableVertexAttribArray(0), gl.vertexAttribPointer(0, 2, gl.FLOAT, !1, 0, 0);
+      for (let i = 0; i < 2; i++) {
+        const t = this.makeTex(gl.RGBA8, this.flowW, this.flowH, gl.RGBA, gl.UNSIGNED_BYTE, null, gl.LINEAR), fb = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb), gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0), this.flowTex.push(t), this.flowFb.push(fb);
+      }
+      this.clearFlow();
+    }
+    makeTex(internal, w, h, format, type, data, filter) {
+      const gl = this.gl, t = gl.createTexture();
+      return gl.bindTexture(gl.TEXTURE_2D, t), gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1), gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, type, data), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE), t;
+    }
+    clearFlow() {
+      const gl = this.gl;
+      for (const fb of this.flowFb)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb), gl.viewport(0, 0, this.flowW, this.flowH), gl.clearColor(128 / 255, 128 / 255, 0, 1), gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null), this.flowDirty = !1;
+    }
+    clearState() {
+      const gl = this.gl;
+      for (const fb of this.stateFb)
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb), gl.viewport(0, 0, TEX_W, this.texH), gl.clearColor(0, 0, 0, 0), gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null), this.stateDirty = !1;
+    }
+    setImage(img) {
+      if (this.destroyed || this.lost) return;
+      const gl = this.gl;
+      this.lastImage = img, this.aspect = img.naturalWidth / img.naturalHeight || 2.5, this.flowH = Math.max(32, Math.round(this.flowW / this.aspect));
+      for (const t of this.flowTex)
+        gl.bindTexture(gl.TEXTURE_2D, t), gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, this.flowW, this.flowH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      this.clearFlow(), this.imgTex && gl.deleteTexture(this.imgTex), this.imgTex = gl.createTexture(), gl.bindTexture(gl.TEXTURE_2D, this.imgTex), gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, !1), gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img), gl.generateMipmap(gl.TEXTURE_2D), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE), gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE), this.buildParticles(img), this.ready = !0, this.opts.intro && !this.opts.reducedMotion && this.startIntro(), this.wake();
+    }
+    /** One particle per material pixel of a grid laid over the image. */
+    buildParticles(img) {
+      const gl = this.gl, baseGrid = this.lowPower ? 640 : 1e3, gw = Math.round(baseGrid * Math.sqrt(clamp(this.opts.density, 0.15, 2))), gh = Math.max(1, Math.round(gw / this.aspect));
+      this.gridW = gw;
+      let data;
+      try {
+        const c = document.createElement("canvas");
+        c.width = gw, c.height = gh;
+        const ctx = c.getContext("2d", { willReadFrequently: !0 });
+        ctx.imageSmoothingQuality = "high", ctx.drawImage(img, 0, 0, gw, gh), data = ctx.getImageData(0, 0, gw, gh).data;
+      } catch {
+        throw new Error("Image is not CORS-readable");
+      }
+      let transparent = 0;
+      for (let i = 3; i < data.length; i += 4 * 7) data[i] < 250 && transparent++;
+      if (this.alphaMode = transparent > data.length / (4 * 7) / 20, this.opts.imgBg) this.imgBg = this.opts.imgBg;
+      else if (!this.alphaMode) {
+        let r = 0, g = 0, b = 0, n2 = 0;
+        const pw = Math.max(2, Math.round(gw * 0.012));
+        for (const [cx, cy] of [[0, 0], [gw - pw, 0], [0, gh - pw], [gw - pw, gh - pw]])
+          for (let y = cy; y < cy + pw; y++)
+            for (let x = cx; x < cx + pw; x++) {
+              const i = (y * gw + x) * 4;
+              r += data[i], g += data[i + 1], b += data[i + 2], n2++;
+            }
+        this.imgBg = [r / n2 / 255, g / n2 / 255, b / n2 / 255];
+      }
+      const home = [], col = [];
+      for (let y = 0; y < gh; y++)
+        for (let x = 0; x < gw; x++) {
+          const i = (y * gw + x) * 4, r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
+          if (this.alphaMode) {
+            const a = data[i + 3] / 255;
+            if (a < 0.12 || a < 0.5 && Math.random() > a * 2) continue;
+          } else {
+            const dev = Math.hypot(r - this.imgBg[0], g - this.imgBg[1], b - this.imgBg[2]);
+            if (dev < 0.03 || dev < 0.07 && Math.random() > (dev - 0.03) / 0.04) continue;
+          }
+          const jx = (Math.random() - 0.5) * 0.6, jy = (Math.random() - 0.5) * 0.6;
+          home.push((x + 0.5 + jx) / gw, (y + 0.5 + jy) / gh, Math.random(), 0.85 + Math.random() * 0.3), col.push(data[i], data[i + 1], data[i + 2], 255);
+        }
+      const n = home.length / 4;
+      this.n = n, this.texH = Math.max(1, Math.ceil(n / TEX_W));
+      const total = TEX_W * this.texH, homeArr = new Float32Array(total * 4);
+      homeArr.set(home);
+      const colArr = new Uint8Array(total * 4);
+      colArr.set(col);
+      for (const t of [this.homeTex, this.colTex, ...this.stateTex]) t && gl.deleteTexture(t);
+      for (const f of this.stateFb) gl.deleteFramebuffer(f);
+      this.stateTex = [], this.stateFb = [], this.homeTex = this.makeTex(gl.RGBA32F, TEX_W, this.texH, gl.RGBA, gl.FLOAT, homeArr, gl.NEAREST), this.colTex = this.makeTex(gl.RGBA8, TEX_W, this.texH, gl.RGBA, gl.UNSIGNED_BYTE, colArr, gl.NEAREST);
+      for (let i = 0; i < 2; i++) {
+        const t = this.makeTex(this.stateFormat.internal, TEX_W, this.texH, gl.RGBA, this.stateFormat.type, null, gl.NEAREST), fb = gl.createFramebuffer();
+        if (gl.bindFramebuffer(gl.FRAMEBUFFER, fb), gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0), gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error("Float FBO incomplete");
+        this.stateTex.push(t), this.stateFb.push(fb);
+      }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null), this.homeData = homeArr, this.clearState();
+    }
+    startIntro() {
+      const gl = this.gl, home = this.homeData;
+      if (!home) return;
+      const w = this.rect.w > 10 ? this.rect.w : 1300, total = TEX_W * this.texH, st = new Float32Array(total * 4);
+      for (let i = 0; i < this.n; i++) {
+        const hx = home[i * 4] - 0.5, hy = home[i * 4 + 1] - 0.5, sd = home[i * 4 + 2], ang = (Math.random() - 0.5) * 0.9 + (hx > 0 ? 0 : Math.PI), dist = w * (0.04 + Math.random() * 0.14) * (0.5 + Math.abs(hx) * 1.4);
+        st[i * 4] = Math.cos(ang) * dist + hx * w * 0.25 * sd, st[i * 4 + 1] = Math.sin(ang) * dist * 0.55 + hy * 120 * (Math.random() - 0.5);
+      }
+      gl.bindTexture(gl.TEXTURE_2D, this.stateTex[this.stateIdx]), gl.texImage2D(gl.TEXTURE_2D, 0, this.stateFormat.internal, TEX_W, this.texH, 0, gl.RGBA, gl.FLOAT, st), this.introT = 0, this.stateDirty = !0;
+    }
+    setOptions(o) {
+      const rebuild = o.density !== void 0 && o.density !== this.opts.density || o.imgBg !== void 0 && String(o.imgBg) !== String(this.opts.imgBg);
+      if (this.opts = { ...this.opts, ...o }, rebuild && this.ready && this.lastImage)
+        try {
+          this.buildParticles(this.lastImage);
+        } catch {
+          this.onFail();
+        }
+      this.wake();
+    }
+    resize(cssW, cssH, rect) {
+      this.cssW = Math.max(1, cssW), this.cssH = Math.max(1, cssH), this.rect = rect;
+      let dpr = Math.min(window.devicePixelRatio || 1, this.lowPower ? 1.5 : 2);
+      this.cssW * this.cssH * dpr * dpr > 45e5 && (dpr = Math.max(1, Math.sqrt(45e5 / (this.cssW * this.cssH))));
+      const w = Math.round(this.cssW * dpr), h = Math.round(this.cssH * dpr);
+      (this.canvas.width !== w || this.canvas.height !== h) && (this.canvas.width = w, this.canvas.height = h), this.draw();
+    }
+    setVisible(v) {
+      this.visible = v, v ? this.wake() : this.stop();
+    }
+    pointer(type, x, y, touch) {
+      if (!this.opts.interactive || this.lost) return;
+      const now = performance.now();
+      if (type === "leave" || type === "up") {
+        touch ? this.touchRelease = now + 260 : this.presenceTarget = 0, this.wake();
+        return;
+      }
+      (this.mouse.x < -9e3 || type === "down") && (this.mouse.x = this.prevMouse.x = x, this.mouse.y = this.prevMouse.y = y), this.target.x = x, this.target.y = y, this.presenceTarget = 1, this.lastInput = now, this.settle = 0, type === "down" && (this.burst = 1, this.touchRelease = 0), this.wake();
+    }
+    wake() {
+      if (!this.ready || this.running || !this.visible || this.destroyed || this.lost) {
+        this.ready && !this.running && this.draw();
+        return;
+      }
+      this.running = !0, this.last = performance.now(), this.raf = requestAnimationFrame(this.frame);
+    }
+    stop() {
+      this.running = !1, cancelAnimationFrame(this.raf);
+    }
+    radiusPx() {
+      return this.opts.radius * clamp(this.rect.w / 1400, 0.6, 1.25);
+    }
+    strength() {
+      return this.opts.strength * (this.opts.reducedMotion ? 0.5 : 1);
+    }
+    firstFrame() {
+      if (this.onFirstFrame) {
+        const cb = this.onFirstFrame;
+        this.onFirstFrame = null, requestAnimationFrame(() => cb());
+      }
+    }
+    stepFlow(dt) {
+      const gl = this.gl, P = this.pFlow, dst = 1 - this.flowIdx;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.flowFb[dst]), gl.viewport(0, 0, this.flowW, this.flowH), gl.disable(gl.BLEND), gl.useProgram(P.p), gl.bindVertexArray(this.vao), gl.activeTexture(gl.TEXTURE0), gl.bindTexture(gl.TEXTURE_2D, this.flowTex[this.flowIdx]), gl.uniform1i(P.u.uPrev, 0), gl.uniform2f(P.u.uTexel, 1 / this.flowW, 1 / this.flowH);
+      const r = this.rect;
+      gl.uniform2f(P.u.uMouse, (this.mouse.x - r.x) / r.w, (this.mouse.y - r.y) / r.h), gl.uniform2f(P.u.uVel, clamp(this.mvel.x / 40, -1, 1), clamp(this.mvel.y / 40, -1, 1)), gl.uniform2f(P.u.uSize, r.w, r.h), gl.uniform1f(P.u.uRadius, this.radiusPx()), gl.uniform1f(P.u.uPresence, Math.max(this.presence, this.burst)), gl.uniform1f(P.u.uDecay, Math.pow(0.968, dt)), gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4), this.flowIdx = dst, this.flowDirty = !0;
+    }
+    stepSim(dt) {
+      if (!this.n) return;
+      const gl = this.gl, P = this.pSim, o = this.opts, r = this.rect, dst = 1 - this.stateIdx, intro = o.reducedMotion || !o.intro ? 0 : Math.pow(1 - this.introT, 2);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.stateFb[dst]), gl.viewport(0, 0, TEX_W, this.texH), gl.disable(gl.BLEND), gl.useProgram(P.p), gl.bindVertexArray(this.vao), gl.activeTexture(gl.TEXTURE0), gl.bindTexture(gl.TEXTURE_2D, this.stateTex[this.stateIdx]), gl.uniform1i(P.u.uState, 0), gl.activeTexture(gl.TEXTURE1), gl.bindTexture(gl.TEXTURE_2D, this.homeTex), gl.uniform1i(P.u.uHome, 1), gl.activeTexture(gl.TEXTURE2), gl.bindTexture(gl.TEXTURE_2D, this.flowTex[this.flowIdx]), gl.uniform1i(P.u.uFlow, 2), gl.uniform2f(P.u.uSize, r.w, r.h), gl.uniform2f(P.u.uMouse, this.mouse.x - r.x, this.mouse.y - r.y), gl.uniform1f(P.u.uRadius, this.radiusPx()), gl.uniform1f(P.u.uPresence, Math.max(this.presence, this.burst)), gl.uniform1f(P.u.uStrength, this.strength() * (1 + this.burst * 1.5)), gl.uniform1f(P.u.uSpread, clamp(o.spread, 0, 2)), gl.uniform1f(P.u.uTurb, clamp(o.turbulence, 0, 2) * (o.reducedMotion ? 0.3 : 1)), gl.uniform1f(P.u.uReturn, clamp(o.returnSpeed, 0, 2)), gl.uniform1f(P.u.uTime, this.time), gl.uniform1f(P.u.uDt, dt), gl.uniform1f(P.u.uIntro, intro), gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4), this.stateIdx = dst, this.stateDirty = !0;
+    }
+    draw() {
+      if (!this.ready || this.lost || this.destroyed) return;
+      const gl = this.gl, o = this.opts, r = this.rect, rm = o.reducedMotion, introVis = rm || !o.intro ? 1 : Math.pow(this.introT, 2.2), amb = (o.ambient && !rm ? clamp(o.ambientIntensity, 0, 2) : 0) + this.flowing * 0.85 * clamp(o.liquid, 0, 2) * (rm ? 0.3 : 1), rest = o.restStyle === "particles" ? 1 : 0, [br, bg, bb] = o.bg, [ir, ig, ib] = this.imgBg, dpr = this.canvas.width / this.cssW, pres = Math.max(this.presence, this.burst), mx = this.mouse.x - r.x, my = this.mouse.y - r.y;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null), gl.viewport(0, 0, this.canvas.width, this.canvas.height), gl.bindVertexArray(this.vao), gl.disable(gl.BLEND);
+      const I = this.pImg;
+      if (gl.useProgram(I.p), gl.activeTexture(gl.TEXTURE0), gl.bindTexture(gl.TEXTURE_2D, this.imgTex), gl.uniform1i(I.u.uImg, 0), gl.activeTexture(gl.TEXTURE1), gl.bindTexture(gl.TEXTURE_2D, this.flowTex[this.flowIdx]), gl.uniform1i(I.u.uFlow, 1), gl.uniform2f(I.u.uRes, this.cssW, this.cssH), gl.uniform1f(I.u.uDpr, dpr), gl.uniform4f(I.u.uRect, r.x, r.y, r.w, r.h), gl.uniform3f(I.u.uBg, br, bg, bb), gl.uniform3f(I.u.uImgBg, ir, ig, ib), gl.uniform2f(I.u.uMouse, mx, my), gl.uniform1f(I.u.uPresence, pres), gl.uniform1f(I.u.uRadius, this.radiusPx()), gl.uniform1f(I.u.uStrength, this.strength()), gl.uniform1f(I.u.uTime, this.time), gl.uniform1f(I.u.uAmbient, amb), gl.uniform1f(I.u.uIntroVis, introVis), gl.uniform1f(I.u.uRest, rest), gl.uniform1f(I.u.uAlphaMode, this.alphaMode ? 1 : 0), gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4), !this.n || !this.stateDirty && rest === 0 && introVis >= 1) return;
+      const P = this.pPart;
+      gl.useProgram(P.p), gl.enable(gl.BLEND), gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA), gl.activeTexture(gl.TEXTURE0), gl.bindTexture(gl.TEXTURE_2D, this.stateTex[this.stateIdx]), gl.uniform1i(P.u.uState, 0), gl.activeTexture(gl.TEXTURE1), gl.bindTexture(gl.TEXTURE_2D, this.homeTex), gl.uniform1i(P.u.uHome, 1), gl.activeTexture(gl.TEXTURE2), gl.bindTexture(gl.TEXTURE_2D, this.colTex), gl.uniform1i(P.u.uCol, 2), gl.activeTexture(gl.TEXTURE3), gl.bindTexture(gl.TEXTURE_2D, this.flowTex[this.flowIdx]), gl.uniform1i(P.u.uFlow, 3), gl.uniform1i(P.u.uTexW, TEX_W), gl.uniform4f(P.u.uRect, r.x, r.y, r.w, r.h), gl.uniform2f(P.u.uRes, this.cssW, this.cssH), gl.uniform2f(P.u.uMouse, mx, my), gl.uniform1f(P.u.uRadius, this.radiusPx()), gl.uniform1f(P.u.uPresence, pres);
+      const spacing = r.w / this.gridW;
+      gl.uniform1f(P.u.uDot, spacing * 1.45 * clamp(o.dotSize, 0.2, 3)), gl.uniform1f(P.u.uTime, this.time), gl.uniform1f(P.u.uAmbient, amb), gl.uniform1f(P.u.uStreak, (o.streaks ? 1 : 0) * (0.45 + 0.55 * introVis)), gl.uniform1f(P.u.uIntroVis, introVis), gl.uniform1f(P.u.uRest, rest), gl.uniform1f(P.u.uDpr, dpr), this.alphaMode ? gl.uniform3f(P.u.uTint, 1, 1, 1) : gl.uniform3f(P.u.uTint, br / Math.max(ir, 1e-3), bg / Math.max(ig, 1e-3), bb / Math.max(ib, 1e-3)), gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.n), gl.disable(gl.BLEND);
+    }
+    destroy() {
+      var _a;
+      this.destroyed = !0, this.stop(), this.canvas.removeEventListener("webglcontextlost", this.onLost);
+      const gl = this.gl;
+      if (!this.lost) {
+        gl.deleteBuffer(this.quad), gl.deleteVertexArray(this.vao);
+        for (const t of [...this.flowTex, ...this.stateTex, this.imgTex, this.homeTex, this.colTex]) t && gl.deleteTexture(t);
+        for (const f of [...this.flowFb, ...this.stateFb]) gl.deleteFramebuffer(f);
+        for (const p of [this.pFlow, this.pSim, this.pPart, this.pImg]) p && gl.deleteProgram(p.p);
+      }
+      (_a = gl.getExtension("WEBGL_lose_context")) == null || _a.loseContext();
+    }
+  }
+  function computeRect(w, h, aspect, band, p) {
+    const bandH = Math.max(80, band.bottom - band.top);
+    let rw, maxH;
+    w >= 1024 ? (rw = w * 1.02 * p.scale, maxH = bandH * 1.1 * p.scale) : w >= 640 ? (rw = w * 1.3 * p.scale, maxH = bandH * 1.15 * p.scale) : aspect < 1.3 ? (rw = w * 1 * p.mobileScale, maxH = bandH * 1 * p.mobileScale) : (rw = w * 1.9 * p.mobileScale, maxH = bandH * 1.2 * p.mobileScale), rw / aspect > maxH && (rw = maxH * aspect);
+    const rh = rw / aspect, cx = w * (0.5 + p.x / 100), cy = (band.top + band.bottom) / 2 + h * (p.y / 100);
+    return { x: cx - rw / 2, y: cy - rh / 2, w: rw, h: rh };
+  }
+  Object.assign(window, { LiquidEngine, computeRect, hexToRgb, clampN: clamp });
+})();
+
+</script>
+<script>
+(function(){
+  // ---- AYARLAR ----
+  const AYARLAR = {
+    boyut: 0.86,          // logonun kutuya göre büyüklüğü (0.5 - 1)
+    etkilesim: true,      // imleçle dağılma
+    yaricap: 200,         // imlecin etki alanı (px)
+    guc: 1,               // dağılma gücü
+    ortamHareketi: 0.7,   // logonun kendi kendine hafif dalgalanması (0 = kapalı)
+    girisAnimasyonu: true,// açılışta parçacıkların toplanması
+    dinlenme: 'particles' // 'particles' = parçacık dokusu, 'image' = düz logo
+  };
+  // ------------------
+  const root=document.getElementById('ast-fx'), img=document.getElementById('ast-fallback');
+  let aspect=img.naturalWidth&&img.naturalHeight?img.naturalWidth/img.naturalHeight:1100/714, engine=null;
+  function rect(){
+    const w=root.clientWidth,h=root.clientHeight,bw=w*AYARLAR.boyut,bh=h*AYARLAR.boyut;
+    let rw=bw, rh=bw/aspect; if(rh>bh){rh=bh;rw=bh*aspect;}
+    return {x:(w-rw)/2,y:(h-rh)/2,w:rw,h:rh};
+  }
+  function relayout(){
+    const r=rect();
+    Object.assign(img.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'});
+    if(engine) engine.resize(root.clientWidth,root.clientHeight,r);
+  }
+  const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas=document.createElement('canvas'); root.insertBefore(canvas,img);
+  try{
+    engine=new LiquidEngine(canvas,{interactive:AYARLAR.etkilesim,strength:AYARLAR.guc,radius:AYARLAR.yaricap,density:1,dotSize:1,spread:1,
+      turbulence:1,returnSpeed:1,streaks:true,restStyle:AYARLAR.dinlenme,ambient:AYARLAR.ortamHareketi>0,ambientIntensity:AYARLAR.ortamHareketi,
+      speed:1,intro:AYARLAR.girisAnimasyonu,reducedMotion:rm,bg:[1,1,1],imgBg:null,liquid:1},()=>{root.dataset.gl='off';});
+  }catch(e){root.dataset.gl='off';engine=null;}
+  new ResizeObserver(relayout).observe(root);
+  document.addEventListener('visibilitychange',()=>engine&&engine.setVisible(!document.hidden));
+  const pos=e=>{const b=root.getBoundingClientRect();return [e.clientX-b.left,e.clientY-b.top];};
+  root.addEventListener('pointermove',e=>{const t=e.pointerType==='touch';if(t&&e.buttons===0&&e.pressure===0)return;const[x,y]=pos(e);engine&&engine.pointer('move',x,y,t);},{passive:true});
+  root.addEventListener('pointerdown',e=>{const[x,y]=pos(e);engine&&engine.pointer('down',x,y,e.pointerType==='touch');},{passive:true});
+  ['pointerup','pointercancel'].forEach(n=>root.addEventListener(n,e=>{const[x,y]=pos(e);engine&&engine.pointer('up',x,y,e.pointerType==='touch');},{passive:true}));
+  root.addEventListener('pointerleave',e=>{const[x,y]=pos(e);engine&&engine.pointer('leave',x,y,e.pointerType==='touch');},{passive:true});
+  function start(){
+    aspect=img.naturalWidth/img.naturalHeight||aspect; relayout();
+    if(engine&&root.dataset.gl!=='off'){try{engine.onFirstFrame=()=>{root.dataset.gl='on';};engine.setImage(img);relayout();}catch(e){root.dataset.gl='off';}}
+  }
+  if(img.complete&&img.naturalWidth) start(); else img.addEventListener('load',start,{once:true});
+  relayout();
+})();
+</script>
+</body>
+</html>

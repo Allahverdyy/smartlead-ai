@@ -12,7 +12,8 @@ AST Digital'in web sitesinde çalışan **akıllı satış asistanı**: Etsy sat
 - ✅ Ortam kurulumu ve duman testi
 - ✅ Mimari tasarım
 - ✅ Backend modülleri (config, database, ai_service, routes, create_app)
-- ✅ 56 otomatik test (`python -m pytest -v`)
+- ✅ 61 otomatik test (`python -m pytest -v`)
+- ✅ Yapay zekâ: Groq, düşerse Google Gemini (yedek)
 - ✅ Render'da canlı: https://smartlead-ai-dse5.onrender.com (`/health`, `/widget`, `/dashboard`, `/kvkk`)
 - ✅ Wix: tüm sayfalarda asistan popup'ı (giriş ekranı, KVKK onayı, kalıcı sohbet geçmişi, silme)
 - 🟡 Wix Yönetim Paneli (Velo): kod `wix/` klasöründe

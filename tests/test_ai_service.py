@@ -1,5 +1,7 @@
 """Modül F: yapay zekâ servisinin kendi kuralları (Groq'a bağlanmadan)."""
-from app.services.ai_service import AIService
+import pytest
+
+from app.services.ai_service import AIService, AIServiceError
 
 
 def test_anahtar_yoksa_demo_modu():
@@ -119,3 +121,51 @@ def test_normal_cevaptaki_iki_nokta_dokunulmaz():
 def test_iletisim_alindi_notu_eklenir():
     mesajlar = AIService(api_key='x')._mesajlari_hazirla('ali 05551112233', [], iletisim_alindi=True)
     assert mesajlar[-2]['role'] == 'system' and 'kaydetti' in mesajlar[-2]['content']
+
+
+# ---------------- Yedek sağlayıcı (Gemini) ----------------
+
+def test_groq_duserse_gemini_cevap_verir():
+    servis = AIService(api_key='x', gemini_key='g')
+    def groq_hata(m): raise AIServiceError('Groq yok')
+    servis._groq_istegi = groq_hata
+    servis._gemini_istegi = lambda m: 'Gemini cevabı'
+    assert servis.yanit_uret('merhaba') == 'Gemini cevabı'
+
+
+def test_ikisi_de_duserse_hata_firlatilir():
+    servis = AIService(api_key='x', gemini_key='g')
+    def hata(m): raise AIServiceError('yok')
+    servis._groq_istegi = hata; servis._gemini_istegi = hata
+    with pytest.raises(AIServiceError):
+        servis.yanit_uret('merhaba')
+
+
+def test_gemini_secilirse_once_gemini_denenir():
+    servis = AIService(api_key='x', gemini_key='g', saglayici='gemini')
+    sira = [ad for ad, _ in servis._saglayici_sirasi()]
+    assert sira == ['gemini', 'groq']
+
+
+def test_yalniz_gemini_anahtari_varsa_demo_degil():
+    servis = AIService(api_key='', gemini_key='g')
+    servis._gemini_istegi = lambda m: 'Tamam'
+    assert servis.yanit_uret('merhaba') == 'Tamam'
+
+
+def test_gemini_mesaj_bicimi(monkeypatch):
+    import requests
+    yakalanan = {}
+    class Yanit:
+        status_code = 200
+        def json(self): return {'candidates': [{'content': {'parts': [{'text': 'ok'}]}}]}
+    def sahte_post(url, headers, json, timeout):
+        yakalanan.update(url=url, headers=headers, govde=json); return Yanit()
+    monkeypatch.setattr(requests, 'post', sahte_post)
+    servis = AIService(api_key='', gemini_key='g')
+    mesajlar = [{'role': 'system', 'content': 'kurallar'}, {'role': 'user', 'content': 'selam'},
+                {'role': 'assistant', 'content': 'merhaba'}, {'role': 'user', 'content': 'kupa'}]
+    assert servis._gemini_istegi(mesajlar) == 'ok'
+    assert yakalanan['headers']['x-goog-api-key'] == 'g'
+    assert yakalanan['govde']['systemInstruction']['parts'][0]['text'] == 'kurallar'
+    assert [c['role'] for c in yakalanan['govde']['contents']] == ['user', 'model', 'user']
