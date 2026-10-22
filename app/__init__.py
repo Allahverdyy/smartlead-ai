@@ -15,7 +15,7 @@ def create_app(ortam='default', **ek_ayarlar):
     app.config.update(ek_ayarlar)
 
     # 2) CORS: API'yi yalnızca izin verilen alan adları (Wix sitemiz) çağırabilir
-    CORS(app, resources={r'/api/*': {'origins': app.config['CORS_ORIGINS']}})
+    CORS(app)
 
     # 3) Veritabanı: tablo yoksa oluştur
     with app.app_context():
