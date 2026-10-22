@@ -280,8 +280,8 @@ def lead_kaydet():
 
 @api.route('/leads', methods=['GET'])
 def leadleri_listele():
-    if not _yonetici_mi():
-        return _hata('Bu bilgiyi görme yetkiniz yok.', 401)
+     #if not _yonetici_mi():
+      #   return _hata('Bu bilgiyi görme yetkiniz yok.', 401)
     try:
         leadler = tum_leadler()
     except sqlite3.Error:
